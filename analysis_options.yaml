@@ -1,0 +1,5 @@
+analyzer:
+  strong-mode:
+  errors:
+    missing_required_param: warning
+    missing_return: warning
