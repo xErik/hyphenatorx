@@ -40,4 +40,4 @@ This package is a copy of [hyphenator](https://pub.dev/packages/hyphenator).
 
 This package has been updated to Dart 3.
 
-I will have a look at possible performance improvements. 
+I will have a look at a possible performance improvement and general refactoring.
