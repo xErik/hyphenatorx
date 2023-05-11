@@ -9,3 +9,8 @@
 ## 1.1.0
 
 - Synchronous and asynchronous loading of language data.
+
+## 1.1.1
+
+- Added cache for hypenated and non-hyphenated words.
+- Added live demo.

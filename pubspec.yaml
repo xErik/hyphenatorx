@@ -1,7 +1,8 @@
 name: hyphenatorx 
 description: Implementation of an hyphenation algorithm, based on TeX definitions.
-version: 1.1.0
-homepage: https://github.com/xErik/hyphenatorx
+version: 1.1.1
+repository: https://github.com/xErik/hyphenatorx
+issues: https://github.com/xErik/hyphenatorx/issues
 
 environment:
   sdk: '>=2.19.6 <4.0.0'

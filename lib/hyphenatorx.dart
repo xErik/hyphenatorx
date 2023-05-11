@@ -1,8 +1,7 @@
-import 'languages/languageconfig.dart';
-import 'src/extensions.dart';
-import 'src/pattern.dart';
+import 'package:hyphenatorx/src/calculationhelper.dart';
 
-const _startEndMarker = '.';
+import 'languages/languageconfig.dart';
+import 'src/pattern.dart';
 
 class Hyphenator {
   final List<Pattern> _patterns = [];
@@ -10,6 +9,7 @@ class Hyphenator {
   final String hyphenateSymbol;
   final int minWordLength;
   final int minLetterCount;
+  late final CalculationHelper calc;
 
   static Future<Hyphenator> load(
     Language lang, {
@@ -33,28 +33,36 @@ class Hyphenator {
   }) {
     assert(minWordLength > 0);
 
-    this._patterns.addAll(config.data['pattern']
+    _patterns.addAll(config.data['pattern']
         .map<Pattern>((pattern) => Pattern(
             pattern['result'] as String, List<int>.from(pattern['levels'])))
         .toList()
       ..sort());
 
-    this._exceptions.addEntries(
-          (config.data['exception'] as Map<String, dynamic>)
-              .entries
-              .map((entry) => MapEntry(entry.key, List<int>.from(entry.value))),
-        );
+    _exceptions.addEntries(
+      (config.data['exception'] as Map<String, dynamic>)
+          .entries
+          .map((entry) => MapEntry(entry.key, List<int>.from(entry.value))),
+    );
+
+    calc = CalculationHelper(
+        _patterns, minLetterCount, minWordLength, hyphenateSymbol);
   }
+
+  List<String> get cachedHyphendWords => calc.cacheHyphendWords.values.toList();
+  List<String> get cachedNonHyphendWords =>
+      calc.cacheNonHyphendWords.values.toList();
 
   /// Hyphenates a string with spaces.
   String hyphenate(String text) {
     var currentWord = StringBuffer();
-    var result = new StringBuffer();
+    var result = StringBuffer();
 
     for (int i = 0; i < text.length; i++) {
       final c = text[i];
 
-      if (c.isLetter) {
+      // is letter?
+      if (!(c == c.toLowerCase() && c == c.toUpperCase())) {
         currentWord.write(c);
       } else {
         if (currentWord.length > 0) {
@@ -67,12 +75,21 @@ class Hyphenator {
 
     result.write(hyphenateWord(currentWord.toString()));
 
+    calc.logCache();
+
     return result.toString();
   }
 
   /// Hyphenates a single word.
   String hyphenateWord(String inputWord) {
-    if (_isNotNeedHyphenate(inputWord)) return inputWord;
+    if (calc.isNotNeedHyphenate(inputWord)) return inputWord;
+
+    if (calc.cacheHyphendWords.containsKey(inputWord)) {
+      return calc.cacheHyphendWords[inputWord]!;
+    }
+    if (calc.cacheNonHyphendWords.containsKey(inputWord)) {
+      return calc.cacheNonHyphendWords[inputWord]!;
+    }
 
     final word = inputWord.toLowerCase();
 
@@ -81,18 +98,32 @@ class Hyphenator {
     if (_exceptions.containsKey(word))
       hyphenationMask = _exceptions[word];
     else {
-      final levels = _generateLevelsForWord(word);
-      hyphenationMask = _hyphenatedMaskFromLevels(levels);
-      _correctHyphenationMask(hyphenationMask);
+      final levels = calc.generateLevelsForWord(word);
+      hyphenationMask = calc.hyphenatedMaskFromLevels(levels);
+      calc.correctHyphenationMask(hyphenationMask);
     }
 
-    return _hyphenateByMask(inputWord, hyphenationMask);
+    final result = calc.hyphenateByMask(inputWord, hyphenationMask);
+    if (result == inputWord) {
+      calc.cacheNonHyphendWords[inputWord] = result;
+    } else {
+      calc.cacheHyphendWords[inputWord] = result;
+    }
+    return result;
   }
 
   /// Hyphenates a string and returns a list of
   /// valid hyphenations.
   List<String> hyphenateWordToList(String inputWord) {
-    if (_isNotNeedHyphenate(inputWord)) return <String>[inputWord];
+    if (calc.isNotNeedHyphenate(inputWord)) return <String>[inputWord];
+
+    if (calc.cacheHyphenateWordToList.containsKey(inputWord)) {
+      return calc.cacheHyphenateWordToList[inputWord]!;
+    }
+
+    if (calc.cacheNonHyphenateWordToList.containsKey(inputWord)) {
+      return calc.cacheNonHyphenateWordToList[inputWord]!;
+    }
 
     final word = inputWord.toLowerCase();
 
@@ -101,103 +132,18 @@ class Hyphenator {
     if (_exceptions.containsKey(word))
       hyphenationMask = _exceptions[word];
     else {
-      final levels = _generateLevelsForWord(word);
-      hyphenationMask = _hyphenatedMaskFromLevels(levels);
-      _correctHyphenationMask(hyphenationMask);
+      final levels = calc.generateLevelsForWord(word);
+      hyphenationMask = calc.hyphenatedMaskFromLevels(levels);
+      hyphenationMask = calc.correctHyphenationMask(hyphenationMask);
     }
 
-    return _hyphenateByMaskToList(inputWord, hyphenationMask);
-  }
-
-  List<int> _generateLevelsForWord(String word) {
-    final wordString = '$_startEndMarker$word$_startEndMarker';
-
-    final levels = List.filled(wordString.length, 0);
-
-    for (int i = 0; i < wordString.length - 2; ++i) {
-      int patternIndex = 0;
-
-      for (int count = 1; count <= wordString.length - i; ++count) {
-        var patternFromWord =
-            Pattern.patternOnly(wordString.substring(i, i + count));
-
-        if (patternFromWord.compareTo(_patterns[patternIndex]) < 0) continue;
-
-        patternIndex = _patterns.indexWhere(
-          (pattern) => pattern.compareTo(patternFromWord) > 0,
-          patternIndex,
-        );
-
-        if (patternIndex == -1) break;
-
-        if (patternFromWord.compareTo(_patterns[patternIndex]) >= 0)
-          for (int levelIndex = 0;
-              levelIndex < _patterns[patternIndex].levelsCount - 1;
-              ++levelIndex) {
-            int level = _patterns[patternIndex].levelByIndex(levelIndex);
-
-            if (level > levels[i + levelIndex]) levels[i + levelIndex] = level;
-          }
-      }
-    }
-    return levels;
-  }
-
-  List<int> _hyphenatedMaskFromLevels(List<int> levels) {
-    int length = levels.length - 2;
-
-    final hyphenationMask = List<int>.filled(length, 0);
-    hyphenationMask[0] = 0;
-
-    for (int i = 1; i < length; i++) {
-      if (levels[i + 1] % 2 != 0) hyphenationMask[i] = 1;
-    }
-
-    return hyphenationMask;
-  }
-
-  void _correctHyphenationMask(List<int> mask) {
-    if (mask.length > minLetterCount) {
-      for (int i = 0; i < minLetterCount; i++) {
-        mask[i] = 0;
-      }
-
-      final correctionLength = minLetterCount > 0 ? minLetterCount - 1 : 0;
-
-      for (int i = mask.length - correctionLength; i < mask.length; i++) {
-        mask[i] = 0;
-      }
+    final result = calc.hyphenateByMaskToList(inputWord, hyphenationMask);
+    if (result == inputWord) {
+      calc.cacheNonHyphenateWordToList[inputWord] = result;
     } else {
-      for (int i = 0; i < mask.length; i++) {
-        mask[i] = 0;
-      }
+      calc.cacheHyphenateWordToList[inputWord] = result;
     }
+    return result;
+    // return calc.hyphenateByMaskToList(inputWord, hyphenationMask);
   }
-
-  String _hyphenateByMask(String word, List<int>? mask) {
-    var result = StringBuffer();
-    for (int i = 0; i < word.length; i++) {
-      if (mask![i] > 0) result.write(hyphenateSymbol);
-      result.write(word[i]);
-    }
-    return result.toString();
-  }
-
-  List<String> _hyphenateByMaskToList(String word, List<int>? mask) {
-    StringBuffer currentSyllable = StringBuffer();
-    List<String> returnList = <String>[];
-
-    for (int i = 0; i < word.length; i++) {
-      if (mask![i] > 0) {
-        returnList.add(currentSyllable.toString());
-        currentSyllable.clear();
-      }
-      currentSyllable.write(word[i]);
-    }
-
-    returnList.add(currentSyllable.toString());
-    return returnList;
-  }
-
-  bool _isNotNeedHyphenate(String input) => input.length < minWordLength;
 }

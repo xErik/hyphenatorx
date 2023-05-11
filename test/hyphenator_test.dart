@@ -113,11 +113,10 @@ void main() {
     expect(hyphenator.hyphenate('disciplines'), 'disciplines');
   });
 
-  test('min word length', () {
+  test('stopwatch', () {
     final hyphenator = Hyphenator(
       config,
       hyphenateSymbol: '_',
-      minWordLength: 50,
     );
 
     final text =
@@ -160,10 +159,11 @@ void main() {
     final min = stopWatches.reduce(Math.min);
     final max = stopWatches.reduce(Math.max);
     print('''
-In micro:
+Stopwatch:
+   #: ${stopWatches.length}
  min: $min millis
  max: $max millis
- avr: ${avg.toStringAsFixed(2)} millis
+ avr: ${avg.toStringAsFixed(2)} millis = ${(avg * 1000).truncate()} micros
 ''');
   });
 }

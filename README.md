@@ -2,9 +2,11 @@
 
 Implementation of an hyphenation algorithm.
 
-The patterns used in the algorithm can be found [here](https://tug.org/tex-hyphen/).
+The `tex` patterns used in the algorithm can be found [here](https://tug.org/tex-hyphen/).
 
-it seems to work fine for western languages, other languages have to be evaluated.
+The package seems to work fine for western languages, other languages have to be evaluated.
+
+A live Flutter demo can be found here: [https://xerik.github.io/hyphenatorx/](https://xerik.github.io/hyphenatorx/).
 
 ## Installation
 
@@ -16,15 +18,25 @@ flutter pub add hyphenatorx
 
 Hyphenator instantiates a language specific configuration:
 
-**As a Dart object**: Without synchronous loading. The data is compiled into your project. All 71 langauge files together have a size of 13.3 MB.
+**As a Dart object** 
+
+Without synchronous loading. The data is compiled into your project. All 71 langauge files together have a size of 13.3 MB.
   
-**From JSON**: With asynchronous loading. The data will be loaded as needed. This option is less memory intense.
+**From JSON**
+
+With asynchronous loading. The data will be loaded as needed from the local `assets` folder. This option is less memory intensive.
+
+**Languages**
 
 Available languages are given by the `enum Language`.
 
+**Cache**
+
+Internally, hyphenated as well as non-hyphenated words are cached.
+
 ### Asynchronous Instantiation
 
-For asynchronous operation select the appropriate `Language.language_XX` value.
+Select the appropriate `Language.language_XX` value.
 
 ```dart
 import 'package:hyphenatorx/hyphenatorx.dart';
@@ -33,8 +45,7 @@ import 'package:hyphenatorx/languages/languageconfig.dart';
 
 final hyphernator = await Hyphenator.load(
     Language.language_en_us, 
-    hyphenateSymbol: '_'
-  );
+    hyphenateSymbol: '_');
 
 expect(
   hyphenator.hyphenate('subdivision subdivision'), 
@@ -51,7 +62,7 @@ expect(
 
 ### Synchronous Instantiation
 
-For synchronous operation instatiate the appropriate `Language_XX` object.
+Instatiate the appropriate `Language_XX` object.
 
 ```dart 
 import 'package:hyphenatorx/hyphenatorx.dart';
@@ -78,10 +89,16 @@ expect(
   ['sub', 'di', 'vi', 'sion']);
 ```
 
+## Generate JSON and Dart files
+
+```
+dart run ./tool/tex2dart.dart
+```
+
+The tool will delete `assets` and `lib/languages` before generating new files. It processes tex files located in `tool\tex\`.
+
 ## Source
 
-This package is a copy of [hyphenator](https://pub.dev/packages/hyphenator).
+This package is a copy and extension of [hyphenator](https://pub.dev/packages/hyphenator).
 
-This package has been updated to Dart 3.
-
-I will have a look at a possible performance improvement and general refactoring.
+Possible performance improvement and general refactoring is TBD.

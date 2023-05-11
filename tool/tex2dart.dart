@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:hyphenatorx/src/extensions.dart';
 import 'package:path/path.dart';
 
 final Directory dirLanguage = Directory('./lib/languages/');
@@ -172,4 +171,12 @@ Map<String, dynamic> _patternFromString(String pattern) {
     'result': result,
     'levels': levels,
   };
+}
+
+extension StringIsDigit on String {
+  bool get isDigit => double.tryParse(this) != null;
+}
+
+extension StringAsInt on String {
+  int get asInt => int.parse(this);
 }
