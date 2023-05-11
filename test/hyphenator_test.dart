@@ -11,11 +11,8 @@ void main() {
   final LanguageConfig config = Language_en_us();
 
   test('async', () async {
-    final LanguageConfig configFromJson =
-        await LanguageConfig.load(Language.en_us);
-
-    final hyphenator = Hyphenator(
-      configFromJson,
+    final hyphenator = await Hyphenator.load(
+      Language.language_en_us,
       hyphenateSymbol: '_',
     );
 

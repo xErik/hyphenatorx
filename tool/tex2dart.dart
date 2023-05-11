@@ -35,7 +35,8 @@ void main() {
     String name = basename(file.path);
     name = name.substring(0, name.lastIndexOf('.'));
 
-    languages.add(name.replaceAll('-', '_').replaceAll('hyph_', ''));
+    languages
+        .add('language_' + name.replaceAll('-', '_').replaceAll('hyph_', ''));
 
     List<String> lines = File(file.path)
         .readAsLinesSync()
@@ -64,17 +65,18 @@ void main() {
       }
     }
 
-    _writeFile(name, pat, exc);
+    _writeLanguageConfigIndividual(name, pat, exc);
   });
 
-  _writeAbstract(languages);
+  _writeLanguageConfigGeneral(languages);
 }
 
-_writeAbstract(List<String> languages) {
+_writeLanguageConfigGeneral(List<String> languages) {
   String out = """
     import 'dart:convert';
     import 'package:flutter/services.dart';
 
+    // The PREFIX language_ protects against Dart keywords like "is"
     enum Language { ${languages.join(',')} }
 
     class LanguageConfig {
@@ -85,10 +87,10 @@ _writeAbstract(List<String> languages) {
       Map<String, dynamic> get data => _data;
 
       static Future<LanguageConfig> load(Language lang) async {
-        final path = 'packages/hyphenatorx/assets/language_\${lang.name}.json';
+        final path = 'packages/hyphenatorx/assets/\${lang.name}.json';
 
         final data =
-          await rootBundle.loadStructuredData(path, (e) => json.decode(e));
+          await rootBundle.loadStructuredData<Map<String, dynamic>>(path, (e) async => json.decode(e));
 
         return LanguageConfig(data);
       }
@@ -97,7 +99,8 @@ _writeAbstract(List<String> languages) {
   File('${dirLanguage.path}/languageconfig.dart').writeAsStringSync(out);
 }
 
-_writeFile(String name, List<String> pat, List<String> exc) {
+_writeLanguageConfigIndividual(
+    String name, List<String> pat, List<String> exc) {
   final classSuffix = name.replaceAll('hyph-', '_').replaceAll('-', '_');
 
   final List<Map<String, dynamic>> patterns = [];

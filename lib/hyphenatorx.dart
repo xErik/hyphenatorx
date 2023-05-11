@@ -11,6 +11,20 @@ class Hyphenator {
   final int minWordLength;
   final int minLetterCount;
 
+  static Future<Hyphenator> load(
+    Language lang, {
+    hyphenateSymbol = '\u{00AD}',
+    minWordLength = 5,
+    minLetterCount = 3,
+  }) async {
+    return Hyphenator(
+      await LanguageConfig.load(lang),
+      hyphenateSymbol: hyphenateSymbol,
+      minWordLength: minWordLength,
+      minLetterCount: minLetterCount,
+    );
+  }
+
   Hyphenator(
     LanguageConfig config, {
     this.hyphenateSymbol = '\u{00AD}',
