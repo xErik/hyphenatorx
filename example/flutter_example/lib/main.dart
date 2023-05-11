@@ -60,37 +60,38 @@ class _HyphenatorExampleWidgetState extends State<HyphenatorExampleWidget> {
             }
             final Hyphenator hyphernator = snapshot.data!;
 
-            return Center(
-                child: SizedBox(
-                    width: 600,
-                    child: Column(
-                      children: [
-                        TextField(
-                          controller: controller,
-                          decoration: const InputDecoration(
-                              hintText: 'Enter some text'),
-                        ),
-                        const SizedBox(height: 32),
-                        text.isEmpty
-                            ? const Text('Enter some text')
-                            : Text(hyphernator.hyphenate(text),
-                                style: const TextStyle(fontSize: 32)),
-                        const SizedBox(height: 32),
-                        text.isEmpty
-                            ? const SizedBox.shrink()
-                            : Text(
-                                'Cached hyphenated:\n\n${hyphernator.cachedHyphendWords}',
-                                textAlign: TextAlign.center,
-                              ),
-                        const SizedBox(height: 32),
-                        text.isEmpty
-                            ? const SizedBox.shrink()
-                            : Text(
-                                'Cached non-hyphenated:\n\n${hyphernator.cachedNonHyphendWords}',
-                                textAlign: TextAlign.center,
-                              )
-                      ],
-                    )));
+            return SingleChildScrollView(
+                child: Center(
+                    child: SizedBox(
+                        width: MediaQuery.of(context).size.width * 2 / 3,
+                        child: Column(
+                          children: [
+                            TextField(
+                              controller: controller,
+                              decoration: const InputDecoration(
+                                  hintText: 'Enter some text'),
+                            ),
+                            const SizedBox(height: 32),
+                            text.isEmpty
+                                ? const Text('Enter some text')
+                                : Text(hyphernator.hyphenate(text),
+                                    style: const TextStyle(fontSize: 32)),
+                            const SizedBox(height: 32),
+                            text.isEmpty
+                                ? const SizedBox.shrink()
+                                : Text(
+                                    'Cached hyphenated:\n\n${hyphernator.cachedHyphendWords}',
+                                    textAlign: TextAlign.center,
+                                  ),
+                            const SizedBox(height: 32),
+                            text.isEmpty
+                                ? const SizedBox.shrink()
+                                : Text(
+                                    'Cached non-hyphenated:\n\n${hyphernator.cachedNonHyphendWords}',
+                                    textAlign: TextAlign.center,
+                                  )
+                          ],
+                        ))));
           }),
     );
   }
