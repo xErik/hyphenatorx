@@ -4,25 +4,38 @@ import 'dart:io';
 import 'package:hyphenatorx/src/extensions.dart';
 import 'package:path/path.dart';
 
+final Directory dirLanguage = Directory('./lib/languages/');
+final Directory dirAssets = Directory('./assets/');
+final Directory dirTex = Directory('./tool/tex/');
+
+/// DANGER! DELETES ./assets and ./lib/languages
+///
+/// dart run .\tool\tex2dart.dart
+///
 /// Combines ./tool/tex/* into
 ///   dart files: lib/languages/
 ///   json files: assets/
 ///
-/// dart run .\tool\tex2dart.dart
 ///
 void main() {
   final List<String> languages = [];
 
-  Directory('./lib/languages/').deleteSync();
-  Directory('./assets/').deleteSync();
+  if (dirLanguage.existsSync()) {
+    dirLanguage.deleteSync(recursive: true);
+  }
+  dirLanguage.createSync(recursive: true);
+  if (dirAssets.existsSync()) {
+    dirAssets.deleteSync(recursive: true);
+  }
+  dirAssets.createSync(recursive: true);
 
-  final files = Directory('./tool/tex/').listSync();
+  final files = dirTex.listSync();
 
   files.forEach((file) {
     String name = basename(file.path);
     name = name.substring(0, name.lastIndexOf('.'));
 
-    languages.add(name.replaceAll('-', '_'));
+    languages.add(name.replaceAll('-', '_').replaceAll('hyph_', ''));
 
     List<String> lines = File(file.path)
         .readAsLinesSync()
@@ -51,34 +64,40 @@ void main() {
       }
     }
 
-    writeFile(name, pat, exc);
+    _writeFile(name, pat, exc);
   });
 
-  writeAbstract(languages);
+  _writeAbstract(languages);
 }
 
-writeAbstract(List<String> languages) {
+_writeAbstract(List<String> languages) {
   String out = """
     import 'dart:convert';
     import 'package:flutter/services.dart';
 
     enum Language { ${languages.join(',')} }
 
-    abstract class LanguageConfig {
-    
-      Map<String, dynamic> get data;
-    
-      static Future<LanguageConfig> load(Language lang) async {
-        return await rootBundle.loadStructuredData(
-          'packages/hyphenatorx/assets/language_\${lang.name}.json',
-          (e) => json.decode(e));
-      }
+    class LanguageConfig {
+      final Map<String, dynamic> _data;
 
-    }""";
-  File('./lib/languages/languageconfig.dart').writeAsStringSync(out);
+      LanguageConfig(this._data);
+
+      Map<String, dynamic> get data => _data;
+
+      static Future<LanguageConfig> load(Language lang) async {
+        final path = 'packages/hyphenatorx/assets/language_\${lang.name}.json';
+
+        final data =
+          await rootBundle.loadStructuredData(path, (e) => json.decode(e));
+
+        return LanguageConfig(data);
+      }
+    }
+    """;
+  File('${dirLanguage.path}/languageconfig.dart').writeAsStringSync(out);
 }
 
-writeFile(String name, List<String> pat, List<String> exc) {
+_writeFile(String name, List<String> pat, List<String> exc) {
   final classSuffix = name.replaceAll('hyph-', '_').replaceAll('-', '_');
 
   final List<Map<String, dynamic>> patterns = [];
@@ -101,9 +120,9 @@ writeFile(String name, List<String> pat, List<String> exc) {
       final Map<String, dynamic> data = $js;
     }""";
 
-  File('./lib/languages/language$classSuffix.dart').writeAsStringSync(out);
+  File('${dirLanguage.path}/language$classSuffix.dart').writeAsStringSync(out);
 
-  File('./assets/language$classSuffix.json').writeAsStringSync(js);
+  File('${dirAssets.path}/language$classSuffix.json').writeAsStringSync(js);
 }
 
 const _exceptionDelimiter = '-';

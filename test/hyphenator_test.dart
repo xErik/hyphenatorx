@@ -5,14 +5,26 @@ import 'package:hyphenatorx/hyphenatorx.dart';
 import 'package:hyphenatorx/languages/language_en_us.dart';
 import 'package:hyphenatorx/languages/languageconfig.dart';
 
-void main() async {
+void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  // final resource =
-  //     await DefaultResourceLoader.load(DefaultResourceLoaderLanguage.enUs);
   final LanguageConfig config = Language_en_us();
 
-  test('patterns', () async {
+  test('async', () async {
+    final LanguageConfig configFromJson =
+        await LanguageConfig.load(Language.en_us);
+
+    final hyphenator = Hyphenator(
+      configFromJson,
+      hyphenateSymbol: '_',
+    );
+
+    expect(hyphenator.hyphenate('subdivision'), 'sub_di_vi_sion');
+    expect(hyphenator.hyphenate('creative'), 'cre_ative');
+    expect(hyphenator.hyphenate('disciplines'), 'dis_ci_plines');
+  });
+
+  test('patterns', () {
     final hyphenator = Hyphenator(
       config,
       hyphenateSymbol: '_',
@@ -23,7 +35,7 @@ void main() async {
     expect(hyphenator.hyphenate('disciplines'), 'dis_ci_plines');
   });
 
-  test('hyphenate word to list', () async {
+  test('hyphenate word to list', () {
     final hyphenator = Hyphenator(
       config,
       hyphenateSymbol: '_',
@@ -37,7 +49,7 @@ void main() async {
         <String>['dis', 'ci', 'plines']);
   });
 
-  test('hyphenate word to list, punctuation', () async {
+  test('hyphenate word to list, punctuation', () {
     final hyphenator = Hyphenator(
       config,
       hyphenateSymbol: '_',
@@ -51,7 +63,7 @@ void main() async {
         <String>['dis', 'ci', 'plines,']);
   });
 
-  test('exceptions', () async {
+  test('exceptions', () {
     final hyphenator = Hyphenator(
       config,
       hyphenateSymbol: '_',
@@ -60,7 +72,7 @@ void main() async {
     expect(hyphenator.hyphenate('philanthropic'), 'phil_an_thropic');
   });
 
-  test('text', () async {
+  test('text', () {
     final hyphenator = Hyphenator(
       config,
       hyphenateSymbol: '-',
@@ -74,7 +86,7 @@ void main() async {
     expect(hyphenator.hyphenate(text), expectedText);
   });
 
-  test('min letter count', () async {
+  test('min letter count', () {
     final hyphenator = Hyphenator(
       config,
       hyphenateSymbol: '_',
@@ -84,7 +96,7 @@ void main() async {
     expect(hyphenator.hyphenate('disciplines'), 'disci_plines');
   });
 
-  test('min letter count dont raise', () async {
+  test('min letter count dont raise', () {
     final hyphenator = Hyphenator(
       config,
       hyphenateSymbol: '_',
@@ -94,7 +106,7 @@ void main() async {
     expect(hyphenator.hyphenate('disciplines'), 'disciplines');
   });
 
-  test('min word length', () async {
+  test('min word length', () {
     final hyphenator = Hyphenator(
       config,
       hyphenateSymbol: '_',
@@ -104,7 +116,7 @@ void main() async {
     expect(hyphenator.hyphenate('disciplines'), 'disciplines');
   });
 
-  test('min word length', () async {
+  test('min word length', () {
     final hyphenator = Hyphenator(
       config,
       hyphenateSymbol: '_',

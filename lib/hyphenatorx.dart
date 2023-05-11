@@ -25,9 +25,11 @@ class Hyphenator {
         .toList()
       ..sort());
 
-    this
-        ._exceptions
-        .addAll(Map<String, List<int>>.from(config.data['exception']));
+    this._exceptions.addEntries(
+          (config.data['exception'] as Map<String, dynamic>)
+              .entries
+              .map((entry) => MapEntry(entry.key, List<int>.from(entry.value))),
+        );
   }
 
   /// Hyphenates a string with spaces.

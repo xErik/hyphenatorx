@@ -1,16 +1,22 @@
     import 'dart:convert';
     import 'package:flutter/services.dart';
 
-    enum Language { hyph_da,hyph_de_1996,hyph_en_us }
+    enum Language { da,de_1996,en_us }
 
-    abstract class LanguageConfig {
-    
-      Map<String, dynamic> get data;
-    
+    class LanguageConfig {
+      final Map<String, dynamic> _data;
+
+      LanguageConfig(this._data);
+
+      Map<String, dynamic> get data => _data;
+
       static Future<LanguageConfig> load(Language lang) async {
-        return await rootBundle.loadStructuredData(
-          'packages/hyphenatorx/assets/language_${lang.name}.json',
-          (e) => json.decode(e));
-      }
+        final path = 'packages/hyphenatorx/assets/language_${lang.name}.json';
 
+        final data =
+          await rootBundle.loadStructuredData(path, (e) => json.decode(e));
+
+        return LanguageConfig(data);
+      }
     }
+    
