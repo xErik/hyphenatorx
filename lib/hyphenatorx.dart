@@ -3,6 +3,7 @@ import 'package:hyphenatorx/src/calculationhelper.dart';
 import 'languages/languageconfig.dart';
 import 'src/pattern.dart';
 
+/// Class hyphenating text.
 class Hyphenator {
   final List<Pattern> _patterns = [];
   final Map<String, List<int>> _exceptions = {};
@@ -11,6 +12,8 @@ class Hyphenator {
   final int minLetterCount;
   late final CalculationHelper calc;
 
+  /// Instantiates a Hyphenator with a given language
+  /// configuration from JSON.
   static Future<Hyphenator> load(
     Language lang, {
     hyphenateSymbol = '\u{00AD}',
@@ -25,6 +28,8 @@ class Hyphenator {
     );
   }
 
+  /// Instantiates a Hyphenator with a given language
+  /// configuration from Dart object.
   Hyphenator(
     LanguageConfig config, {
     this.hyphenateSymbol = '\u{00AD}',
@@ -49,7 +54,10 @@ class Hyphenator {
         _patterns, minLetterCount, minWordLength, hyphenateSymbol);
   }
 
+  /// Returns cached and hyphenated words.
   List<String> get cachedHyphendWords => calc.cacheHyphendWords.values.toList();
+
+  /// Returns cached and non-hyphenated words.
   List<String> get cachedNonHyphendWords =>
       calc.cacheNonHyphendWords.values.toList();
 
@@ -138,7 +146,7 @@ class Hyphenator {
     }
 
     final result = calc.hyphenateByMaskToList(inputWord, hyphenationMask);
-    if (result == inputWord) {
+    if (result.length == 1) {
       calc.cacheNonHyphenateWordToList[inputWord] = result;
     } else {
       calc.cacheHyphenateWordToList[inputWord] = result;

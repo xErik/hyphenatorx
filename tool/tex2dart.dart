@@ -70,21 +70,26 @@ void main() {
   _writeLanguageConfigGeneral(languages);
 }
 
+/// Writes the general language configuration file.
 _writeLanguageConfigGeneral(List<String> languages) {
   String out = """
     import 'dart:convert';
     import 'package:flutter/services.dart';
 
-    // The PREFIX language_ protects against Dart keywords like "is"
+    /// The PREFIX language_ protects against Dart keywords like "is"
     enum Language { ${languages.join(',')} }
 
+    /// Auto-generated class. 
     class LanguageConfig {
       final Map<String, dynamic> _data;
 
+      /// Constructor.
       LanguageConfig(this._data);
 
+      /// The language configuration.
       Map<String, dynamic> get data => _data;
 
+      /// Instantiate language configuration.
       static Future<LanguageConfig> load(Language lang) async {
         final path = 'packages/hyphenatorx/assets/\${lang.name}.json';
 
@@ -98,6 +103,7 @@ _writeLanguageConfigGeneral(List<String> languages) {
   File('${dirLanguage.path}/languageconfig.dart').writeAsStringSync(out);
 }
 
+/// Writes a specific language configuration file.
 _writeLanguageConfigIndividual(
     String name, List<String> pat, List<String> exc) {
   final classSuffix = name.replaceAll('hyph-', '_').replaceAll('-', '_');
@@ -118,7 +124,11 @@ _writeLanguageConfigIndividual(
 
   String out = """
     import "./languageconfig.dart";
+
+      /// Auto-generated class.
       class Language$classSuffix implements LanguageConfig {
+      
+      /// Language configuration.
       final Map<String, dynamic> data = $js;
     }""";
 
@@ -129,7 +139,8 @@ _writeLanguageConfigIndividual(
 
 const _exceptionDelimiter = '-';
 
-// RegExp('\\w') works only for English letters
+/// Internal calculation.
+/// RegExp('\\w') works only for English letters
 List<int> _exceptionMaskFromString(String exc) {
   final list = <int>[];
   int index = 0;
@@ -147,6 +158,7 @@ List<int> _exceptionMaskFromString(String exc) {
   return list;
 }
 
+/// Internal calculation.
 Map<String, dynamic> _patternFromString(String pattern) {
   final levels = <int>[];
   String result = '';
@@ -173,10 +185,12 @@ Map<String, dynamic> _patternFromString(String pattern) {
   };
 }
 
+/// Helper.
 extension StringIsDigit on String {
   bool get isDigit => double.tryParse(this) != null;
 }
 
+/// Helper.
 extension StringAsInt on String {
   int get asInt => int.parse(this);
 }

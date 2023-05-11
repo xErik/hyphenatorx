@@ -14,3 +14,7 @@
 
 - Added cache for hypenated and non-hyphenated words.
 - Added live demo.
+
+## 1.1.2
+
+- Bugfix concerning caching of hyphernation-as-lists function.
