@@ -2,16 +2,19 @@ import 'dart:math' as Math show min, max;
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hyphenatorx/hyphenatorx.dart';
+import 'package:hyphenatorx/languages/language_en_us.dart';
+import 'package:hyphenatorx/languages/languageconfig.dart';
 
 void main() async {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  final resource =
-      await DefaultResourceLoader.load(DefaultResourceLoaderLanguage.enUs);
+  // final resource =
+  //     await DefaultResourceLoader.load(DefaultResourceLoaderLanguage.enUs);
+  final LanguageConfig config = Language_en_us();
 
   test('patterns', () async {
     final hyphenator = Hyphenator(
-      resource: resource,
+      config,
       hyphenateSymbol: '_',
     );
 
@@ -22,7 +25,7 @@ void main() async {
 
   test('hyphenate word to list', () async {
     final hyphenator = Hyphenator(
-      resource: resource,
+      config,
       hyphenateSymbol: '_',
     );
 
@@ -36,7 +39,7 @@ void main() async {
 
   test('hyphenate word to list, punctuation', () async {
     final hyphenator = Hyphenator(
-      resource: resource,
+      config,
       hyphenateSymbol: '_',
     );
 
@@ -50,7 +53,7 @@ void main() async {
 
   test('exceptions', () async {
     final hyphenator = Hyphenator(
-      resource: resource,
+      config,
       hyphenateSymbol: '_',
     );
 
@@ -59,7 +62,7 @@ void main() async {
 
   test('text', () async {
     final hyphenator = Hyphenator(
-      resource: resource,
+      config,
       hyphenateSymbol: '-',
     );
 
@@ -73,7 +76,7 @@ void main() async {
 
   test('min letter count', () async {
     final hyphenator = Hyphenator(
-      resource: resource,
+      config,
       hyphenateSymbol: '_',
       minLetterCount: 4,
     );
@@ -83,7 +86,7 @@ void main() async {
 
   test('min letter count dont raise', () async {
     final hyphenator = Hyphenator(
-      resource: resource,
+      config,
       hyphenateSymbol: '_',
       minLetterCount: 50,
     );
@@ -93,7 +96,7 @@ void main() async {
 
   test('min word length', () async {
     final hyphenator = Hyphenator(
-      resource: resource,
+      config,
       hyphenateSymbol: '_',
       minWordLength: 50,
     );
@@ -103,7 +106,7 @@ void main() async {
 
   test('min word length', () async {
     final hyphenator = Hyphenator(
-      resource: resource,
+      config,
       hyphenateSymbol: '_',
       minWordLength: 50,
     );
@@ -141,7 +144,7 @@ void main() async {
       hyphenator.hyphenate(text);
       startNew.stop();
 
-      stopWatches.add(startNew.elapsedMicroseconds);
+      stopWatches.add(startNew.elapsedMilliseconds);
     }
 
     final avg = stopWatches.reduce((a, b) => a + b) / stopWatches.length;
@@ -149,9 +152,9 @@ void main() async {
     final max = stopWatches.reduce(Math.max);
     print('''
 In micro:
- min: $min
- max: $max
- avr: ${avg.toStringAsFixed(2)}
+ min: $min millis
+ max: $max millis
+ avr: ${avg.toStringAsFixed(2)} millis
 ''');
   });
 }

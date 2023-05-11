@@ -11,6 +11,8 @@ The patterns used in the algorithm can be found [here](https://tug.org/tex-hyphe
 ## Usage
 
 ```dart 
+import 'package:hyphenatorx/hyphenatorx.dart';
+import 'package:hyphenatorx/resourceloader.dart';
 
 final resource = await DefaultResourceLoader.load(
     DefaultResourceLoaderLanguage.enUs

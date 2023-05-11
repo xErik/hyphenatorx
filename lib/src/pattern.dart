@@ -1,51 +1,17 @@
-import 'extensions.dart';
-
 class Pattern implements Comparable<Pattern> {
-  Pattern._(
-    this._pattern,
-    this._levels,
-  );
-
-  factory Pattern.from(String pattern) {
-    final levels = <int?>[];
-    final result = StringBuffer();
-
-    bool waitDigit = true;
-    for (int i = 0; i < pattern.length; i++) {
-      final c = pattern[i];
-
-      if (c.isDigit) {
-        levels.add(c.asInt);
-        waitDigit = false;
-      } else {
-        if (waitDigit) levels.add(0);
-        result.write(c);
-        waitDigit = true;
-      }
-    }
-
-    if (waitDigit) levels.add(0);
-
-    return Pattern._(
-      result.toString(),
-      levels,
-    );
-  }
-
-  Pattern(this._pattern) : _levels = const [];
-
   final String _pattern;
-  final List<int?> _levels;
+  final List<int> _levels;
+
+  Pattern(this._pattern, this._levels);
+
+  Pattern.patternOnly(this._pattern) : _levels = const [];
 
   int get levelsCount => _levels.length;
 
-  int? levelByIndex(int index) => _levels[index];
+  int levelByIndex(int index) => _levels[index];
 
   @override
-  String toString() => 'Pattern{'
-      'pattern: $_pattern, '
-      'levels: $_levels'
-      '}';
+  String toString() => 'Pattern: pattern: $_pattern, levels: $_levels';
 
   @override
   int compareTo(Pattern other) {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hyphenatorx/hyphenatorx.dart';
+import 'package:hyphenatorx/resourceloader.dart';
 
 class HyphenatorExampleWidget extends StatelessWidget {
   final String text =
