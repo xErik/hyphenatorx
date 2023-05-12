@@ -18,3 +18,7 @@
 ## 1.1.2
 
 - Bugfix concerning caching of hyphenation-as-lists function.
+
+## 1.1.3
+
+- Improved performance of method `hyphenate( )` by ~15 % for non-cached invocations.

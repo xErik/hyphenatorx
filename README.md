@@ -32,7 +32,7 @@ Available languages are given by the `enum Language`.
 
 **Cache**
 
-Internally, hyphenated as well as non-hyphenated words are cached.
+Internally, hyphenated as well as non-hyphenated words are cached. Complete texts are not cached, only single words.
 
 ### Asynchronous Instantiation
 
@@ -87,6 +87,38 @@ expect(
 expect(
   hyphenator.hyphenateWordToList('subdivision'),
   ['sub', 'di', 'vi', 'sion']);
+```
+
+## Performance
+
+Old machine:
+
+* Instantiation via Dart EN_US file: 30 milliseconds
+* Hyphenating text with 258 words: 46 milliseconds
+
+Internal testing whether a character is a letter has the most performance impact.
+
+```dart
+// FORMER
+//
+// Results in 54 milliseconds for long text.
+//
+// final isLetter = (c == c.toLowerCase() && c == c.toUpperCase()) == false;
+
+// BETTER
+//
+// Results in 46 milliseconds for long text.
+// Reduction by 15 %.
+//
+// final isLetter = textLower[i] != textUpper[i];
+
+// INCREASE, but most precise?
+//
+// Results in 80 milliseconds for long text.
+// Increase by 48 %.
+//
+// final reLetter = RegExp(r'\p{Letter}', unicode: true);
+// final isLetter = reLetter.hasMatch(c);
 ```
 
 ## Generate JSON and Dart files
