@@ -17,4 +17,4 @@
 
 ## 1.1.2
 
-- Bugfix concerning caching of hyphernation-as-lists function.
+- Bugfix concerning caching of hyphenation-as-lists function.

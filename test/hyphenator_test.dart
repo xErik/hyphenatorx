@@ -114,11 +114,6 @@ void main() {
   });
 
   test('stopwatch', () {
-    final hyphenator = Hyphenator(
-      config,
-      hyphenateSymbol: '_',
-    );
-
     final text =
         '''The arts are a vast subdivision of culture, composed of many 
         creative endeavors and disciplines. It is a broader term than "art", 
@@ -149,9 +144,12 @@ void main() {
 
     for (int i = 0; i < 200; i++) {
       final startNew = Stopwatch()..start();
-      hyphenator.hyphenate(text);
-      startNew.stop();
 
+      final hyphenator = Hyphenator(config, hyphenateSymbol: '_');
+
+      hyphenator.hyphenate(text);
+
+      startNew.stop();
       stopWatches.add(startNew.elapsedMilliseconds);
     }
 
