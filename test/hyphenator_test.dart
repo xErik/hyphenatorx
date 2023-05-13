@@ -15,11 +15,29 @@ void main() {
 
   final LanguageConfig config = Language_en_us();
 
-  test('async', () async {
-    final hyphenator = await Hyphenator.load(
+  test('soft-hyphen', () async {
+    final hyphend = Hyphenator(config).hyphenateWord('subdivision');
+    expect(hyphend.contains('\u{00AD}'), true);
+  });
+
+  test('abbreviations', () async {
+    final abbr = await Hyphenator.languageAbbr();
+    expect(abbr.contains('en_us'), true);
+  });
+
+  test('loadAsync', () async {
+    final hyphenator = await Hyphenator.loadAsync(
       Language.language_en_us,
-      hyphenateSymbol: '_',
+      symbol: '_',
     );
+
+    expect(hyphenator.hyphenate('subdivision'), 'sub_di_vi_sion');
+    expect(hyphenator.hyphenate('creative'), 'cre_ative');
+    expect(hyphenator.hyphenate('disciplines'), 'dis_ci_plines');
+  });
+
+  test('loadAsyncByAbbr', () async {
+    final hyphenator = await Hyphenator.loadAsyncByAbbr('en_us', symbol: '_');
 
     expect(hyphenator.hyphenate('subdivision'), 'sub_di_vi_sion');
     expect(hyphenator.hyphenate('creative'), 'cre_ative');
@@ -29,7 +47,7 @@ void main() {
   test('patterns', () {
     final hyphenator = Hyphenator(
       config,
-      hyphenateSymbol: '_',
+      symbol: '_',
     );
 
     expect(hyphenator.hyphenate('subdivision'), 'sub_di_vi_sion');
@@ -40,7 +58,7 @@ void main() {
   test('hyphenate word', () {
     final hyphenator = Hyphenator(
       config,
-      hyphenateSymbol: '_',
+      symbol: '_',
     );
 
     expect(hyphenator.hyphenateWord('subdivision'), 'sub_di_vi_sion');
@@ -51,7 +69,7 @@ void main() {
   test('hyphenate word to list', () {
     final hyphenator = Hyphenator(
       config,
-      hyphenateSymbol: '_',
+      symbol: '_',
     );
 
     expect(hyphenator.hyphenateWordToList('subdivision'),
@@ -65,7 +83,7 @@ void main() {
   test('hyphenate word to list, punctuation', () {
     final hyphenator = Hyphenator(
       config,
-      hyphenateSymbol: '_',
+      symbol: '_',
     );
 
     expect(hyphenator.hyphenateWordToList('"subdivision"'),
@@ -79,7 +97,7 @@ void main() {
   test('exceptions', () {
     final hyphenator = Hyphenator(
       config,
-      hyphenateSymbol: '_',
+      symbol: '_',
     );
 
     expect(hyphenator.hyphenate('philanthropic'), 'phil_an_thropic');
@@ -88,7 +106,7 @@ void main() {
   test('text', () {
     final hyphenator = Hyphenator(
       config,
-      hyphenateSymbol: '-',
+      symbol: '-',
     );
 
     expect(hyphenator.hyphenate(text), expectedText);
@@ -97,7 +115,7 @@ void main() {
   test('min letter count', () {
     final hyphenator = Hyphenator(
       config,
-      hyphenateSymbol: '_',
+      symbol: '_',
       minLetterCount: 4,
     );
 
@@ -107,7 +125,7 @@ void main() {
   test('min letter count dont raise', () {
     final hyphenator = Hyphenator(
       config,
-      hyphenateSymbol: '_',
+      symbol: '_',
       minLetterCount: 50,
     );
 
@@ -117,7 +135,7 @@ void main() {
   test('min word length', () {
     final hyphenator = Hyphenator(
       config,
-      hyphenateSymbol: '_',
+      symbol: '_',
       minWordLength: 50,
     );
 
@@ -129,7 +147,7 @@ void main() {
     final stopwatchesPerform = <int>[];
 
     final stopwatchInit = Stopwatch()..start();
-    final hyphenator = Hyphenator(config, hyphenateSymbol: '-');
+    final hyphenator = Hyphenator(config, symbol: '-');
     stopwatchInit.stop();
     stopwatchesInit.add(stopwatchInit.elapsedMilliseconds);
 

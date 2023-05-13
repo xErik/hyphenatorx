@@ -7,17 +7,52 @@ import 'src/pattern.dart';
 class Hyphenator {
   late final CalculationHelper calc;
 
+  static Language _getLanguageEnum(String lang) {
+    Language l;
+    final name = 'language_' + lang;
+    try {
+      l = Language.values.firstWhere((l) => l.name == name);
+    } catch (e) {
+      throw 'Language not found: $lang ($name). Try: ${languageAbbr()}';
+    }
+    return l;
+  }
+
+  /// Returns abbreviations of available languages.
+  static List<String> languageAbbr() =>
+      Language.values.map((e) => e.name.substring(9)).toList();
+
   /// Instantiates a Hyphenator with a given language
   /// configuration from JSON.
-  static Future<Hyphenator> load(
+  ///
+  /// `lang` follows the format `en_us` or `de_1996`.
+  /// Throws if language is not found. Check  enum [Language] for
+  /// complete list.
+  static Future<Hyphenator> loadAsyncByAbbr(
+    final String lang, {
+    final String symbol = '\u{00AD}',
+    final int minWordLength = 5,
+    final int minLetterCount = 3,
+  }) async {
+    return Hyphenator(
+      await LanguageConfig.load(_getLanguageEnum(lang)),
+      symbol: symbol,
+      minWordLength: minWordLength,
+      minLetterCount: minLetterCount,
+    );
+  }
+
+  /// Instantiates a Hyphenator with a given language
+  /// configuration from JSON.
+  static Future<Hyphenator> loadAsync(
     final Language lang, {
-    final String hyphenateSymbol = '\u{00AD}',
+    final String symbol = '\u{00AD}',
     final int minWordLength = 5,
     final int minLetterCount = 3,
   }) async {
     return Hyphenator(
       await LanguageConfig.load(lang),
-      hyphenateSymbol: hyphenateSymbol,
+      symbol: symbol,
       minWordLength: minWordLength,
       minLetterCount: minLetterCount,
     );
@@ -27,7 +62,7 @@ class Hyphenator {
   /// configuration from Dart object.
   Hyphenator(
     final LanguageConfig config, {
-    final String hyphenateSymbol = '\u{00AD}',
+    final String symbol = '\u{00AD}',
     final int minWordLength = 5,
     final int minLetterCount = 3,
   }) {
@@ -50,7 +85,7 @@ class Hyphenator {
     );
 
     calc = CalculationHelper(
-        patterns, exceptions, minLetterCount, minWordLength, hyphenateSymbol);
+        patterns, exceptions, minLetterCount, minWordLength, symbol);
   }
 
   /// Returns cached and hyphenated words.
@@ -66,10 +101,10 @@ class Hyphenator {
   String hyphenate(final String text) {
     final currentWord = StringBuffer();
     final result = StringBuffer();
-    final len = text.length;
     final textUpper = text.toUpperCase();
     final textLower = text.toLowerCase();
-    // final isLetterList =
+    // final letters = text.split('');
+    final len = text.length;
 
     for (int i = 0; i < len; i++) {
       final c = text[i];

@@ -22,3 +22,8 @@
 ## 1.1.3
 
 - Improved performance of method `hyphenate( )` by ~15 % for non-cached invocations.
+
+## 1.2.0
+
+- Added widget `TextHyphenated`.
+- Renamed `symbol` and `lang` parameters.

@@ -10,7 +10,7 @@ class CalculationHelper {
   final Map<String, List<int>> _exceptions;
   final int _minLetterCount;
   final int _minWordLength;
-  final String hyphenateSymbol;
+  final String symbol;
   final Map<String, String> cacheHyphendWords = {};
   final Map<String, String> cacheNonHyphendWords = {};
   final Map<String, List<String>> cacheHyphenateWordToList = {};
@@ -21,7 +21,7 @@ class CalculationHelper {
   // final Map<String, List<int>> _cacheCorrectHyphenationMask = {};
 
   CalculationHelper(this._patterns, this._exceptions, this._minLetterCount,
-      this._minWordLength, this.hyphenateSymbol);
+      this._minWordLength, this.symbol);
 
   void logCache() {
     if (kDebugMode) {
@@ -43,45 +43,6 @@ class CalculationHelper {
   // Generate mask
   // -------------------------------------------------------------------------
 
-//   final sws1 = <int>[];
-//   final sws2 = <int>[];
-//   final sws3 = <int>[];
-
-//   void logSw() {
-//     final avg1 = sws1.reduce((a, b) => a + b) / sws1.length;
-//     final min1 = sws1.reduce(m.min);
-//     final max1 = sws1.reduce(m.max);
-//     print('''
-// Stopwatch Level:
-//    #: ${sws1.length}
-//  min: $min1 micros
-//  max: $max1 micros
-//  avr: ${avg1.toStringAsFixed(2)} micros = ${(avg1 / 1000).truncate()} millis
-// ''');
-
-//     final avg2 = sws2.reduce((a, b) => a + b) / sws2.length;
-//     final min2 = sws2.reduce(m.min);
-//     final max2 = sws2.reduce(m.max);
-//     print('''
-// Stopwatch Mask:
-//    #: ${sws2.length}
-//  min: $min2 micros
-//  max: $max2 micros
-//  avr: ${avg2.toStringAsFixed(2)} micros = ${(avg2 / 1000).truncate()} millis
-// ''');
-
-//     final avg3 = sws3.reduce((a, b) => a + b) / sws3.length;
-//     final min3 = sws3.reduce(m.min);
-//     final max3 = sws3.reduce(m.max);
-//     print('''
-// Stopwatch Correct:
-//    #: ${sws3.length}
-//  min: $min3 micros
-//  max: $max3 micros
-//  avr: ${avg3.toStringAsFixed(2)} micros = ${(avg3 / 1000).truncate()} millis
-// ''');
-//   }
-
   List<int> _generateHyphenationMask(final String word) {
     List<int> hyphenationMask;
 
@@ -90,20 +51,9 @@ class CalculationHelper {
     if (_exceptions.containsKey(wordForLookup))
       hyphenationMask = _exceptions[wordForLookup]!;
     else {
-      // final sw1 = Stopwatch()..start();
       final levels = _generateLevelsForWord(wordForLookup);
-      // sw1.stop();
-      // sws1.add(sw1.elapsedMicroseconds);
-
-      // final sw2 = Stopwatch()..start();
       hyphenationMask = _hyphenatedMaskFromLevels(levels);
-      // sw2.stop();
-      // sws2.add(sw2.elapsedMicroseconds);
-
-      // final sw3 = Stopwatch()..start();
       hyphenationMask = _correctHyphenationMask(hyphenationMask);
-      // sw3.stop();
-      // sws3.add(sw3.elapsedMicroseconds);
     }
 
     return hyphenationMask;
@@ -118,7 +68,7 @@ class CalculationHelper {
 
     for (int i = 0; i < word.length; i++) {
       if (mask[i] > 0) {
-        result.write(hyphenateSymbol);
+        result.write(symbol);
       }
       result.write(word[i]);
     }

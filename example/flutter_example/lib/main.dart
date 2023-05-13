@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hyphenatorx/hyphenatorx.dart';
 import 'package:hyphenatorx/languages/languageconfig.dart';
+import 'package:hyphenatorx/texthyphenated.dart';
 
 void main() {
   runApp(const MyApp());
@@ -45,14 +46,13 @@ class _HyphenatorExampleWidgetState extends State<HyphenatorExampleWidget> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _future = Hyphenator.load(Language.language_en_us, hyphenateSymbol: '_');
+    _future = Hyphenator.loadAsync(Language.language_en_us, symbol: '_');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: FutureBuilder<Hyphenator>(
-          // access a Future-field instead, this is just an example
           future: _future,
           builder: (BuildContext context, AsyncSnapshot<Hyphenator> snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
@@ -71,7 +71,7 @@ class _HyphenatorExampleWidgetState extends State<HyphenatorExampleWidget> {
                               decoration: const InputDecoration(
                                   hintText: 'Enter some text'),
                             ),
-                            const SizedBox(height: 32),
+                            const SizedBox(height: 16),
                             text.isEmpty
                                 ? const Text('Enter some text')
                                 : Text(hyphernator.hyphenate(text),
@@ -83,13 +83,27 @@ class _HyphenatorExampleWidgetState extends State<HyphenatorExampleWidget> {
                                     'Cached hyphenated:\n\n${hyphernator.cachedHyphendWords}',
                                     textAlign: TextAlign.center,
                                   ),
-                            const SizedBox(height: 32),
+                            const SizedBox(height: 16),
                             text.isEmpty
                                 ? const SizedBox.shrink()
                                 : Text(
                                     'Cached non-hyphenated:\n\n${hyphernator.cachedNonHyphendWords}',
                                     textAlign: TextAlign.center,
-                                  )
+                                  ),
+                            // const SizedBox(height: 32),
+                            const Divider(),
+                            const Text("Widget Test:"),
+                            const SizedBox(height: 16),
+                            const Text(
+                                "TextHyphenated('subdivision', 'en_us', symbol:'@')"),
+                            const SizedBox(height: 16),
+                            const TextHyphenated('subdivision', 'en_us',
+                                symbol: '@'),
+                            const SizedBox(height: 16),
+                            const Text(
+                                "TextHyphenated('subdivision', 'en_us')"),
+                            const SizedBox(height: 16),
+                            const TextHyphenated('subdivision', 'en_us'),
                           ],
                         ))));
           }),
