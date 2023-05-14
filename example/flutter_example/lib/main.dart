@@ -74,7 +74,7 @@ class _HyphenatorExampleWidgetState extends State<HyphenatorExampleWidget> {
                             const SizedBox(height: 16),
                             text.isEmpty
                                 ? const Text('Enter some text')
-                                : Text(hyphernator.hyphenate(text),
+                                : Text(hyphernator.hyphenateText(text),
                                     style: const TextStyle(fontSize: 32)),
                             const SizedBox(height: 32),
                             text.isEmpty

@@ -64,7 +64,7 @@ class _TextHyphenatedState extends State<TextHyphenated> {
         }
 
         return Text(
-          snapshot.data!.hyphenate(widget.text),
+          snapshot.data!.hyphenateText(widget.text),
           style: widget.style,
           key: widget.textKey,
           strutStyle: widget.strutStyle,

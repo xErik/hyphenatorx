@@ -27,3 +27,14 @@
 
 - Added widget `TextHyphenated`.
 - Renamed `symbol` and `lang` parameters.
+
+## 1.3.0
+
+- Renamed `hyphenateWordToList()` to `syllablesWord()`.
+- Renamed `hyphenate()` to `hyphenateText()`: Hyphenates words only, not word boundaries.
+- Added `hyphenateTextAndBoundaries()`: Injecting additional hyphens at word boundaries, surrounding chars becomming part of a "word".
+
+## 1.4.0
+
+- Removed `hyphenateTextAndBoundaries()`.
+- Added `hyphenateTextToTokens()`: Returns a tree of tokens inducating possible hyphenation.

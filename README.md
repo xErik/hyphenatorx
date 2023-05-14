@@ -47,7 +47,7 @@ import 'package:hyphenatorx/hyphenatorx.dart';
 import 'package:hyphenatorx/languages/language_en_us.dart';
 import 'package:hyphenatorx/languages/languageconfig.dart';
 
-final hyphernator = await Hyphenator.loadAsyn(
+final hyphernator = await Hyphenator.loadAsync(
     Language.language_en_us, 
     hyphenateSymbol: '_');
 
@@ -56,18 +56,6 @@ final hyphernator = await Hyphenator.loadAsyn(
 final hyphernator = await Hyphenator.loadAsyncByAbbr(
     'en_us', 
     hyphenateSymbol: '_');
-
-expect(
-  hyphenator.hyphenate('subdivision subdivision'), 
-  'sub_di_vi_sion sub_di_vi_sion');
-
-expect(
-  hyphenator.hyphenateWord('subdivision'),
-  'sub_di_vi_sion');
-
-expect(
-  hyphenator.hyphenateWordToList('subdivision'),
-  ['sub', 'di', 'vi', 'sion']);
 ```
 
 ### Synchronous Instantiation
@@ -85,9 +73,18 @@ final hyphenator = Hyphenator(
   config,
   hyphenateSymbol: '_',
 );
+```
+
+### Function
+
+```dart
+expect(
+  hyphenator.hyphenateText('subdivision subdivision', 
+    hyphenAtBoundaries: true), 
+  'sub_di_vi_sion_ _sub_di_vi_sion');
 
 expect(
-  hyphenator.hyphenate('subdivision subdivision'), 
+  hyphenator.hyphenateText('subdivision subdivision'), 
   'sub_di_vi_sion sub_di_vi_sion');
 
 expect(
@@ -95,13 +92,46 @@ expect(
   'sub_di_vi_sion');
 
 expect(
-  hyphenator.hyphenateWordToList('subdivision'),
+  hyphenator.syllablesWord('subdivision'),
   ['sub', 'di', 'vi', 'sion']);
+```
+
+Iterating through a token tree. Before and after each token
+a valid hyphen could be added, depending on availabel width.
+
+```dart
+final text = """A vast subdivision of culture, 
+    composed of many creative endeavors and disciplines.""";
+
+final hyphenator = Hyphenator(config);
+final TextTokens result = hyphenator.hyphenateTextToTokens(text);
+
+result.parts.forEach((part) {
+  if (part is NewlineToken) {
+    print(part.text); // = is always a single newline
+  } else if (part is TabsAndSpacesToken) {
+    print(part.text); // tabs and spaces found in `text`
+  } else if (part is WordToken) {
+    part.parts.forEach((syllableAndSurrounding) {
+      print(syllableAndSurrounding.text);
+    });
+  }
+});
+
+// A
+// 
+// vast
+// 
+// sub
+// di
+// vi
+// sion
+// ...
 ```
 
 ### Widget 
 
-This is a convenience Widget, rendering a `Text`. The default symbol is the soft-wrap `'\u{00AD}'`.;
+This is a convenience Widget, rendering a `Text`. The default symbol is the soft-wrap `\u{00AD}`.;
 
 ```dart 
 import 'package:hyphenatorx/texthyphenated.dart';
@@ -109,6 +139,10 @@ import 'package:hyphenatorx/texthyphenated.dart';
 const TextHyphenated('subdivision', 'en_us', symbol: '@'),
 
 /// renders: sub@di@vi@sion
+
+const TextHyphenated('subdivision', 'en_us'),
+
+/// renders: subdivision with invisible soft wraps \u{00AD}
 ```
 
 

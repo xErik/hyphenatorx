@@ -31,17 +31,17 @@ void main() {
       symbol: '_',
     );
 
-    expect(hyphenator.hyphenate('subdivision'), 'sub_di_vi_sion');
-    expect(hyphenator.hyphenate('creative'), 'cre_ative');
-    expect(hyphenator.hyphenate('disciplines'), 'dis_ci_plines');
+    expect(hyphenator.hyphenateText('subdivision'), 'sub_di_vi_sion');
+    expect(hyphenator.hyphenateText('creative'), 'cre_ative');
+    expect(hyphenator.hyphenateText('disciplines'), 'dis_ci_plines');
   });
 
   test('loadAsyncByAbbr', () async {
     final hyphenator = await Hyphenator.loadAsyncByAbbr('en_us', symbol: '_');
 
-    expect(hyphenator.hyphenate('subdivision'), 'sub_di_vi_sion');
-    expect(hyphenator.hyphenate('creative'), 'cre_ative');
-    expect(hyphenator.hyphenate('disciplines'), 'dis_ci_plines');
+    expect(hyphenator.hyphenateText('subdivision'), 'sub_di_vi_sion');
+    expect(hyphenator.hyphenateText('creative'), 'cre_ative');
+    expect(hyphenator.hyphenateText('disciplines'), 'dis_ci_plines');
   });
 
   test('patterns', () {
@@ -50,9 +50,9 @@ void main() {
       symbol: '_',
     );
 
-    expect(hyphenator.hyphenate('subdivision'), 'sub_di_vi_sion');
-    expect(hyphenator.hyphenate('creative'), 'cre_ative');
-    expect(hyphenator.hyphenate('disciplines'), 'dis_ci_plines');
+    expect(hyphenator.hyphenateText('subdivision'), 'sub_di_vi_sion');
+    expect(hyphenator.hyphenateText('creative'), 'cre_ative');
+    expect(hyphenator.hyphenateText('disciplines'), 'dis_ci_plines');
   });
 
   test('hyphenate word', () {
@@ -72,11 +72,10 @@ void main() {
       symbol: '_',
     );
 
-    expect(hyphenator.hyphenateWordToList('subdivision'),
+    expect(hyphenator.syllablesWord('subdivision'),
         <String>['sub', 'di', 'vi', 'sion']);
-    expect(
-        hyphenator.hyphenateWordToList('creative'), <String>['cre', 'ative']);
-    expect(hyphenator.hyphenateWordToList('disciplines'),
+    expect(hyphenator.syllablesWord('creative'), <String>['cre', 'ative']);
+    expect(hyphenator.syllablesWord('disciplines'),
         <String>['dis', 'ci', 'plines']);
   });
 
@@ -86,11 +85,11 @@ void main() {
       symbol: '_',
     );
 
-    expect(hyphenator.hyphenateWordToList('"subdivision"'),
+    expect(hyphenator.syllablesWord('"subdivision"'),
         <String>['"sub', 'di', 'vi', 'sion"']);
-    expect(hyphenator.hyphenateWordToList('creative...'),
-        <String>['cre', 'ative...']);
-    expect(hyphenator.hyphenateWordToList('disciplines,'),
+    expect(
+        hyphenator.syllablesWord('creative...'), <String>['cre', 'ative...']);
+    expect(hyphenator.syllablesWord('disciplines,'),
         <String>['dis', 'ci', 'plines,']);
   });
 
@@ -100,7 +99,7 @@ void main() {
       symbol: '_',
     );
 
-    expect(hyphenator.hyphenate('philanthropic'), 'phil_an_thropic');
+    expect(hyphenator.hyphenateText('philanthropic'), 'phil_an_thropic');
   });
 
   test('text', () {
@@ -109,8 +108,60 @@ void main() {
       symbol: '-',
     );
 
-    expect(hyphenator.hyphenate(text), expectedText);
+    expect(hyphenator.hyphenateText(text), expectedText);
   });
+
+  test('text-with-boundaries', () {
+    final text =
+        """The arts are a vast subdivision of culture, composed of many creative endeavors and disciplines. 
+
+
+        It is a broader term than     "art", which as a description of a field usually means only the visual arts.""";
+
+    final expectedText =
+        """The_ _arts_ _are_ _a_ _vast_ _sub_di_vi_sion_ _of_ _cul_ture,_ _com_posed_ _of_ _many_ _cre_ative_ _endeav_ors_ _and_ _dis_ci_plines._ _
+
+
+_        _It_ _is_ _a_ _broader_ _term_ _than_     _"art",_ _which_ _as_ _a_ _descrip_tion_ _of_ _a_ _field_ _usu_ally_ _means_ _only_ _the_ _visual_ _arts.""";
+
+    final hyphenator = Hyphenator(
+      config,
+      symbol: '_',
+    );
+    expect(
+        hyphenator.hyphenateText(text, hyphenAtBoundaries: true), expectedText);
+  });
+
+  test('text-as-tokens', () {
+    final text = """A vast subdivision of culture, 
+        composed of many creative endeavors and disciplines.""";
+
+    final hyphenator = Hyphenator(config);
+    final result = hyphenator.hyphenateTextToTokens(text);
+
+    expect(result.toString(),
+        "[[A], WS, [vast], WS, [sub, di, vi, sion], WS, [of], WS, [cul, ture,], WS, NL, WS, [com, posed], WS, [of], WS, [many], WS, [cre, ative], WS, [endeav, ors], WS, [and], WS, [dis, ci, plines.]]");
+  });
+
+  // test('text-as-tokens-iterate', () {
+  //   final text = """A vast subdivision of culture,
+  //       composed of many creative endeavors and disciplines.""";
+
+  //   final hyphenator = Hyphenator(config);
+  //   final result = hyphenator.hyphenateTextToTokens(text);
+
+  //   result.parts.forEach((part) {
+  //     if (part is NewlineToken) {
+  //       print(part.text); // = \n
+  //     } else if (part is TabsAndSpacesToken) {
+  //       print(part.text); // tabs and spaces
+  //     } else if (part is WordToken) {
+  //       part.parts.forEach((syllableAndSurrounding) {
+  //         print(syllableAndSurrounding.text);
+  //       });
+  //     }
+  //   });
+  // });
 
   test('min letter count', () {
     final hyphenator = Hyphenator(
@@ -119,7 +170,7 @@ void main() {
       minLetterCount: 4,
     );
 
-    expect(hyphenator.hyphenate('disciplines'), 'disci_plines');
+    expect(hyphenator.hyphenateText('disciplines'), 'disci_plines');
   });
 
   test('min letter count dont raise', () {
@@ -129,7 +180,7 @@ void main() {
       minLetterCount: 50,
     );
 
-    expect(hyphenator.hyphenate('disciplines'), 'disciplines');
+    expect(hyphenator.hyphenateText('disciplines'), 'disciplines');
   });
 
   test('min word length', () {
@@ -139,7 +190,7 @@ void main() {
       minWordLength: 50,
     );
 
-    expect(hyphenator.hyphenate('disciplines'), 'disciplines');
+    expect(hyphenator.hyphenateText('disciplines'), 'disciplines');
   });
 
   test('stopwatch', () {
@@ -147,13 +198,14 @@ void main() {
     final stopwatchesPerform = <int>[];
 
     final stopwatchInit = Stopwatch()..start();
-    final hyphenator = Hyphenator(config, symbol: '-');
+    final LanguageConfig config1 = Language_en_us();
+    final hyphenator = Hyphenator(config1, symbol: '-');
     stopwatchInit.stop();
     stopwatchesInit.add(stopwatchInit.elapsedMilliseconds);
 
     for (int i = 0; i < 200; i++) {
       final stopwatchPerform = Stopwatch()..start();
-      final result = hyphenator.hyphenate(text);
+      final result = hyphenator.hyphenateText(text);
       stopwatchPerform.stop();
       stopwatchesPerform.add(stopwatchPerform.elapsedMilliseconds);
 

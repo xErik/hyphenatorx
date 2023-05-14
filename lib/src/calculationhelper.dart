@@ -13,8 +13,8 @@ class CalculationHelper {
   final String symbol;
   final Map<String, String> cacheHyphendWords = {};
   final Map<String, String> cacheNonHyphendWords = {};
-  final Map<String, List<String>> cacheHyphenateWordToList = {};
-  final Map<String, List<String>> cacheNonHyphenateWordToList = {};
+  final Map<String, List<String>> cacheHyphenateSyllables = {};
+  final Map<String, List<String>> cacheNonHyphenateSyllables = {};
 
   // final Map<String, List<int>> _cacheGenerateLevelsForWord = {};
   // final Map<String, List<int>> _cacheHyphenatedMaskFromLevels = {};
@@ -34,9 +34,8 @@ class CalculationHelper {
     return _hyphenateByMask(word, hyphenationMask);
   }
 
-  List<String> hyphenateToList(final String word) {
-    List<int> hyphenationMask = _generateHyphenationMask(word);
-    return _hyphenateByMaskToList(word, hyphenationMask);
+  List<String> syllables(final String word) {
+    return hyphenate(word).split(symbol);
   }
 
   // -------------------------------------------------------------------------
@@ -74,23 +73,6 @@ class CalculationHelper {
     }
 
     return result.toString();
-  }
-
-  List<String> _hyphenateByMaskToList(final String word, final List<int> mask) {
-    final StringBuffer currentSyllable = StringBuffer();
-    final List<String> list = <String>[];
-
-    for (int i = 0; i < word.length; i++) {
-      if (mask[i] > 0) {
-        list.add(currentSyllable.toString());
-        currentSyllable.clear();
-      }
-      currentSyllable.write(word[i]);
-    }
-
-    list.add(currentSyllable.toString());
-
-    return list;
   }
 
   // -------------------------------------------------------------------------

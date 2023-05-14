@@ -1,4 +1,8 @@
+import 'dart:core';
+
 import 'package:hyphenatorx/src/calculationhelper.dart';
+import 'package:hyphenatorx/src/extensions.dart';
+import 'package:hyphenatorx/texttokens.dart';
 
 import 'languages/languageconfig.dart';
 import 'src/pattern.dart';
@@ -96,14 +100,64 @@ class Hyphenator {
       calc.cacheNonHyphendWords.values.toList();
 
   // RegExp reLetter = RegExp(r'\p{Letter}', unicode: true);
+  final RegExp reBoundaries = RegExp(r'[\t\ ]+');
 
-  /// Hyphenates a string with spaces.
-  String hyphenate(final String text) {
+  /// Hyphenates a text and returns this text broken down into a tree.
+  /// Each node being a potential candidate for leding and triling hyphenation.
+  ///
+  /// WordPartToken is not only a pure syllable, but includes directly
+  /// leading or trailing other symbols like punctuation.
+  ///
+  /// Returns a tree:
+  ///
+  /// TextTokens
+  ///   - WordToken (many syllables)
+  ///     - WordPartToken (syllables and surrounding symbols)
+  ///   - TabsAndSpacesToken
+  ///   - NewlineToken
+  ///
+  /// The actual result looks like this, WS meaning Whitespace and NL Newline:
+  ///
+  /// [[The], WS, [arts], WS, [are], WS, [a], NL, [vast], WS, [sub, di, vi, sion], WS]
+  ///
+  final RegExp split = RegExp(r'\n|[\t ]+');
+  TextTokens hyphenateTextToTokens(final String text) {
+    final hyph = hyphenateText(text);
+    final parts = hyph.replaceAll(r'\r', '').splitWithDelim(split);
+    final List<TextPartToken> partsResult = [];
+
+    for (final part in parts) {
+      if (part.isEmpty) {
+        // hu?!
+      } else if (part == '\n') {
+        partsResult.add(NewlineToken());
+      } else if (part.trim().isEmpty) {
+        partsResult.add(TabsAndSpacesToken(part));
+      } else {
+        // Word
+        partsResult.add(WordToken(part
+            .split(calc.symbol)
+            .map<WordPartToken>((e) => WordPartToken(e))
+            .toList(growable: false)));
+      }
+    }
+
+    return TextTokens(partsResult);
+  }
+
+  /// Hyphenates a text.
+  ///
+  /// The hyphen symbol will be placed inside words only.
+  ///
+  /// Setting `hyphenAtBoundaries: false` will add additional
+  /// hyphens at the outer word boundaries, including punctutation etc.
+  ///
+  /// @TODO rewrite this into a proper parser?
+  String hyphenateText(final String text, {hyphenAtBoundaries = false}) {
     final currentWord = StringBuffer();
     final result = StringBuffer();
     final textUpper = text.toUpperCase();
     final textLower = text.toLowerCase();
-    // final letters = text.split('');
     final len = text.length;
 
     for (int i = 0; i < len; i++) {
@@ -132,9 +186,9 @@ class Hyphenator {
       } else {
         if (currentWord.length > 0) {
           result.write(hyphenateWord(currentWord.toString()));
-
           currentWord.clear();
         }
+
         result.write(c);
       }
     }
@@ -142,7 +196,16 @@ class Hyphenator {
 
     calc.logCache();
 
-    return result.toString();
+    if (hyphenAtBoundaries == false) {
+      return result.toString();
+    } else {
+      // Lazy method to add a hyphen symbol to word boundaries,
+      // including punctuation etc. following or preceeding a syllable.
+      return hyphenateText(text)
+          .toString()
+          .splitWithDelim(reBoundaries)
+          .join(calc.symbol);
+    }
   }
 
   /// Hyphenates a single word.
@@ -166,25 +229,24 @@ class Hyphenator {
     return result;
   }
 
-  /// Hyphenates a string and returns a list of
-  /// valid hyphenations.
-  List<String> hyphenateWordToList(final String word) {
+  /// Returns syllables of a single word, being candidates for hyphenation.
+  List<String> syllablesWord(final String word) {
     if (calc.isNotNeedHyphenate(word)) return <String>[word];
 
-    if (calc.cacheHyphenateWordToList.containsKey(word)) {
-      return calc.cacheHyphenateWordToList[word]!;
+    if (calc.cacheHyphenateSyllables.containsKey(word)) {
+      return calc.cacheHyphenateSyllables[word]!;
     }
 
-    if (calc.cacheNonHyphenateWordToList.containsKey(word)) {
-      return calc.cacheNonHyphenateWordToList[word]!;
+    if (calc.cacheNonHyphenateSyllables.containsKey(word)) {
+      return calc.cacheNonHyphenateSyllables[word]!;
     }
 
-    final result = calc.hyphenateToList(word);
+    final result = calc.syllables(word);
 
     if (result.length == 1) {
-      calc.cacheNonHyphenateWordToList[word] = result;
+      calc.cacheNonHyphenateSyllables[word] = result;
     } else {
-      calc.cacheHyphenateWordToList[word] = result;
+      calc.cacheHyphenateSyllables[word] = result;
     }
     return result;
   }
