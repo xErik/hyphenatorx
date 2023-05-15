@@ -3,14 +3,14 @@ import 'dart:math';
 import 'package:flutter/widgets.dart';
 import 'package:hyphenatorx/src/token/texthelper.dart';
 
-import '../../wrapresult.dart';
-import 'tokeniterator.dart';
-import 'tokens.dart';
+import '../src/token/tokeniterator.dart';
+import '../src/token/tokens.dart';
+import 'wrapresult.dart';
 
 /// Hyphenates tokens with respect to the attributes of
 /// [Text], [TextStyle] and [maxWidth].
 class LineWrapper {
-  final String _hyphen = '-\n';
+  final String _hyphen = '-';
   late final double _maxWidth;
   final List<List<TextPartToken>> _lines = [];
   late final TextPainter _painter;
@@ -47,6 +47,8 @@ class LineWrapper {
         part.sizeCurrent = part.sizeHyphen;
       }
     }
+
+    // print('=== CACHE: ${tokensWidthCache}');
   }
 
   /// Sets the widths of the token with respect to hyphend and not-hyphened.
@@ -91,17 +93,17 @@ class LineWrapper {
       // ------------------------------------------------------------
       if (currToken is NewlineToken) {
         line.add(currToken);
-        _lines.add([...line]);
+        _lines.add([NewlineToken()]);
         line.clear();
       } else
       // ------------------------------------------------------------
       // TABS AND SPACES
       // ------------------------------------------------------------
-      if (currToken is TabsAndSpacesToken) {
+      if (currToken is TabsAndSpacesToken && line.isNotEmpty) {
         if (_canAddNoHyphen([currToken], line)) {
           line.add(currToken);
         } else {
-          _lines.add([...line]);
+          _lines.add([...line]..add(NewlineToken()));
           line.clear();
           line.add(currToken);
         }
@@ -117,15 +119,14 @@ class LineWrapper {
         for (int i = partLength; i > 0; i--) {
           prelist = currToken.parts.sublist(0, i);
           postlist = currToken.parts.sublist(i, partLength);
-
           if (i == partLength && _canAddNoHyphen(prelist, line)) {
-            line.addAll([...prelist]);
+            line.add(currToken); // add whole word
             prelist.clear();
             postlist.clear();
             break;
           } else if (_canAddHyphenlast(prelist, line)) {
             line.addAll(_doHyphenLast(prelist));
-            _lines.add([...line]);
+            _lines.add([...line]..add(NewlineToken()));
             line.clear();
             line.addAll(postlist);
             prelist.clear();
@@ -137,6 +138,11 @@ class LineWrapper {
         // if (prelist.isNotEmpty || postlist.isNotEmpty) {
         //   throw 'Cannot fit: $currToken in $_maxWidth px with fontSize ${_style.fontSize}';
         // }
+
+        if (line.isNotEmpty) {
+          _lines.add([...line]..add(NewlineToken()));
+          line.clear();
+        }
       }
 
       // ------------------------------------------------------------
@@ -154,11 +160,16 @@ class LineWrapper {
       _lines.add(line);
     }
 
+    while (_lines.last.last is NewlineToken) {
+      _lines.last.removeLast();
+    }
+
     final str =
         _lines.map<String>((line) => line.map((e) => e.render()).join()).join();
-
     _painter.text = TextSpan(text: str, style: _style);
     _painter.layout();
+
+    // print('=== RENDERED: $str ${_painter.size}');
 
     return WrapResult(
         TextHelper.clone(_text, str), _style, _maxWidth, _painter.size, _lines);
@@ -169,7 +180,7 @@ class LineWrapper {
     double w =
         line.fold<double>(0, (sum, item) => sum + item.sizeCurrent!.width);
 
-    w += tokens.fold<double>(0, (sum, item) => item.sizeCurrent!.width);
+    w += tokens.fold<double>(0, (sum, item) => sum + item.sizeCurrent!.width);
 
     return w <= _maxWidth;
   }

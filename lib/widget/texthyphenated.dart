@@ -63,24 +63,36 @@ class _TextHyphenatedState extends State<TextHyphenated> {
           throw snapshot.error!;
         }
 
-        return Text(
-          snapshot.data!.hyphenateText(widget.text),
-          style: widget.style,
-          key: widget.textKey,
-          strutStyle: widget.strutStyle,
-          textAlign: widget.textAlign,
-          textDirection: widget.textDirection,
-          locale: widget.locale,
-          softWrap: widget.softWrap,
-          overflow: widget.overflow,
-          textScaleFactor: widget.textScaleFactor,
-          maxLines: widget.maxLines,
-          semanticsLabel: widget.semanticsLabel,
-          textWidthBasis: widget.textWidthBasis,
-          textHeightBehavior: widget.textHeightBehavior,
-          selectionColor: widget.selectionColor,
-        );
+        return LayoutBuilder(builder: (ctx, cnt) {
+          final txt = _makeText(widget.text);
+          final defaultStyle =
+              widget.style != null ? widget.style! : TextStyle();
+          final result =
+              snapshot.data!.wrap(txt, defaultStyle, cnt.maxWidth).textStr;
+
+          return _makeText(result);
+        });
       },
+    );
+  }
+
+  Text _makeText(String str) {
+    return Text(
+      str,
+      style: widget.style,
+      key: widget.textKey,
+      strutStyle: widget.strutStyle,
+      textAlign: widget.textAlign,
+      textDirection: widget.textDirection,
+      locale: widget.locale,
+      softWrap: widget.softWrap,
+      overflow: widget.overflow,
+      textScaleFactor: widget.textScaleFactor,
+      maxLines: widget.maxLines,
+      semanticsLabel: widget.semanticsLabel,
+      textWidthBasis: widget.textWidthBasis,
+      textHeightBehavior: widget.textHeightBehavior,
+      selectionColor: widget.selectionColor,
     );
   }
 }

@@ -33,7 +33,7 @@ class WordPartToken extends TextPartToken {
 
   WordPartToken(this.text);
   int get length => text.length;
-  toString() => text;
+  toString() => text + ' c:${sizeCurrent} h:${sizeHyphen} no-h:${sizeNoHyphen}';
   String render() => text;
   WordPartToken toHyphenAndSize(String hyphen) =>
       WordPartToken(text + hyphen)..sizeCurrent = sizeHyphen;

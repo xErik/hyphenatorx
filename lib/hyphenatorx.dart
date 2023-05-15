@@ -1,15 +1,20 @@
 import 'dart:core';
 
+import 'package:flutter/material.dart';
 import 'package:hyphenatorx/src/calculationhelper.dart';
 import 'package:hyphenatorx/src/extensions.dart';
 import 'package:hyphenatorx/src/token/tokens.dart';
 
 import 'languages/languageconfig.dart';
 import 'src/pattern.dart';
+import 'token/linewrapper.dart';
+import 'token/wrapresult.dart';
 
 /// Wrapper class hyphenating text.
 class Hyphenator {
   late final CalculationHelper calc;
+  final RegExp _reBoundaries = RegExp(r'[\t\ ]+');
+  final RegExp _split = RegExp(r'\n|[\t ]+');
 
   static Language getLanguageEnum(String lang) {
     Language l;
@@ -99,8 +104,14 @@ class Hyphenator {
   List<String> get cachedNonHyphendWords =>
       calc.cacheNonHyphendWords.values.toList();
 
-  // RegExp reLetter = RegExp(r'\p{Letter}', unicode: true);
-  final RegExp reBoundaries = RegExp(r'[\t\ ]+');
+  /// Wraps the [text] with respect to the given [style] and [maxWidth].
+  ///
+  /// [WrapResult] holds a [Text] with the correctly hyphened [String].
+  WrapResult wrap(final Text text, final TextStyle style, final maxWidth) {
+    final tokens = hyphenateTextToTokens(text.data!);
+    final wrapper = LineWrapper(tokens, text, style, maxWidth);
+    return wrapper.render();
+  }
 
   /// Hyphenates a text and returns this text broken down into a tree.
   /// Each node being a potential candidate for leding and triling hyphenation.
@@ -120,10 +131,9 @@ class Hyphenator {
   ///
   /// [[The], WS, [arts], WS, [are], WS, [a], NL, [vast], WS, [sub, di, vi, sion], WS]
   ///
-  final RegExp split = RegExp(r'\n|[\t ]+');
   TextTokens hyphenateTextToTokens(final String text) {
     final hyph = hyphenateText(text);
-    final parts = hyph.replaceAll(r'\r', '').splitWithDelim(split);
+    final parts = hyph.replaceAll(r'\r', '').splitWithDelim(_split);
     final List<TextPartToken> partsResult = [];
 
     for (final part in parts) {
@@ -203,7 +213,7 @@ class Hyphenator {
       // including punctuation etc. following or preceeding a syllable.
       return hyphenateText(text)
           .toString()
-          .splitWithDelim(reBoundaries)
+          .splitWithDelim(_reBoundaries)
           .join(calc.symbol);
     }
   }
