@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hyphenatorx/hyphenatorx.dart';
 import 'package:hyphenatorx/languages/languageconfig.dart';
-import 'package:hyphenatorx/texthyphenated.dart';
+import 'package:hyphenatorx/widget/texthyphenated.dart';
 
 void main() {
   runApp(const MyApp());

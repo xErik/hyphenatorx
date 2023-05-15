@@ -2,7 +2,7 @@ import 'dart:core';
 
 import 'package:hyphenatorx/src/calculationhelper.dart';
 import 'package:hyphenatorx/src/extensions.dart';
-import 'package:hyphenatorx/texttokens.dart';
+import 'package:hyphenatorx/src/token/tokens.dart';
 
 import 'languages/languageconfig.dart';
 import 'src/pattern.dart';
@@ -11,7 +11,7 @@ import 'src/pattern.dart';
 class Hyphenator {
   late final CalculationHelper calc;
 
-  static Language _getLanguageEnum(String lang) {
+  static Language getLanguageEnum(String lang) {
     Language l;
     final name = 'language_' + lang;
     try {
@@ -39,7 +39,7 @@ class Hyphenator {
     final int minLetterCount = 3,
   }) async {
     return Hyphenator(
-      await LanguageConfig.load(_getLanguageEnum(lang)),
+      await LanguageConfig.load(getLanguageEnum(lang)),
       symbol: symbol,
       minWordLength: minWordLength,
       minLetterCount: minLetterCount,
