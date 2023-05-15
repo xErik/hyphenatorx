@@ -33,10 +33,18 @@ class WordPartToken extends TextPartToken {
 
   WordPartToken(this.text);
   int get length => text.length;
-  toString() => text + ' c:${sizeCurrent} h:${sizeHyphen} no-h:${sizeNoHyphen}';
+  toString() => text;
+  // toString() =>
+  //     text +
+  //     ' ${this.runtimeType} c:${sizeCurrent} h:${sizeHyphen} no-h:${sizeNoHyphen}';
   String render() => text;
-  WordPartToken toHyphenAndSize(String hyphen) =>
-      WordPartToken(text + hyphen)..sizeCurrent = sizeHyphen;
+  WordPartToken toHyphenAndSize(String hyphen) {
+    final ret = WordPartToken(text + hyphen);
+    ret.sizeCurrent = sizeHyphen;
+    ret.sizeHyphen = sizeHyphen;
+    ret.sizeNoHyphen = sizeNoHyphen;
+    return ret;
+  }
 }
 
 /// Tabs and empty spaces combined into one. NOT soft-wrap whitespace.

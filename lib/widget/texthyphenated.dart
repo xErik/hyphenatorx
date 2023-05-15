@@ -19,6 +19,8 @@ class TextHyphenated extends StatefulWidget {
   final TextWidthBasis? textWidthBasis;
   final TextHeightBehavior? textHeightBehavior;
   final Color? selectionColor;
+  //
+  final bool doShowDebug;
 
   const TextHyphenated(this.text, this.language,
       {this.symbol = '\u{00AD}',
@@ -36,7 +38,8 @@ class TextHyphenated extends StatefulWidget {
       this.textWidthBasis,
       this.textHeightBehavior,
       this.selectionColor,
-      Key? super.key});
+      Key? super.key,
+      this.doShowDebug = false});
 
   @override
   _TextHyphenatedState createState() => _TextHyphenatedState();
@@ -67,10 +70,37 @@ class _TextHyphenatedState extends State<TextHyphenated> {
           final txt = _makeText(widget.text);
           final defaultStyle =
               widget.style != null ? widget.style! : TextStyle();
-          final result =
-              snapshot.data!.wrap(txt, defaultStyle, cnt.maxWidth).textStr;
+          final wrapped = snapshot.data!.wrap(txt, defaultStyle, cnt.maxWidth);
 
-          return _makeText(result);
+          final wrappedText = _makeText(wrapped.textStr);
+
+          if (widget.doShowDebug == false) {
+            return wrappedText;
+          } else {
+            print(wrapped.toString());
+            return Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Positioned(child: wrappedText),
+                Positioned(
+                  right: 0,
+                  bottom: -35,
+                  child: Container(
+                      color: Colors.red.withAlpha(200),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text('text-size: ' +
+                              wrapped.size.width.toString() +
+                              '/' +
+                              wrapped.size.height.toString()),
+                          Text('max-width: ' + wrapped.maxWidth.toString()),
+                        ],
+                      )),
+                ),
+              ],
+            );
+          }
         });
       },
     );

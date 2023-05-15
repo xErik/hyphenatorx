@@ -3,7 +3,7 @@ import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:hyphenatorx/src/calculationhelper.dart';
 import 'package:hyphenatorx/src/extensions.dart';
-import 'package:hyphenatorx/src/token/tokens.dart';
+import 'package:hyphenatorx/token/tokens.dart';
 
 import 'languages/languageconfig.dart';
 import 'src/pattern.dart';

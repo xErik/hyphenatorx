@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:hyphenatorx/src/token/tokens.dart';
+import 'package:hyphenatorx/token/tokens.dart';
 
 class TokenIterator {
   late final List<TextPartToken> _tokens;

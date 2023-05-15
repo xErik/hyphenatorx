@@ -4,7 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:hyphenatorx/src/token/texthelper.dart';
 
 import '../src/token/tokeniterator.dart';
-import '../src/token/tokens.dart';
+import 'tokens.dart';
 import 'wrapresult.dart';
 
 /// Hyphenates tokens with respect to the attributes of
@@ -120,7 +120,7 @@ class LineWrapper {
           prelist = currToken.parts.sublist(0, i);
           postlist = currToken.parts.sublist(i, partLength);
           if (i == partLength && _canAddNoHyphen(prelist, line)) {
-            line.add(currToken); // add whole word
+            line.addAll([...prelist]); // add all word parts
             prelist.clear();
             postlist.clear();
             break;
@@ -139,10 +139,10 @@ class LineWrapper {
         //   throw 'Cannot fit: $currToken in $_maxWidth px with fontSize ${_style.fontSize}';
         // }
 
-        if (line.isNotEmpty) {
-          _lines.add([...line]..add(NewlineToken()));
-          line.clear();
-        }
+        // if (line.isNotEmpty) {
+        //   _lines.add([...line]..add(NewlineToken()));
+        //   line.clear();
+        // }
       }
 
       // ------------------------------------------------------------
@@ -177,11 +177,29 @@ class LineWrapper {
 
   bool _canAddNoHyphen(
       final List<TextPartToken> tokens, List<TextPartToken> line) {
-    double w =
-        line.fold<double>(0, (sum, item) => sum + item.sizeCurrent!.width);
+    // print('_canAddNoHyphen: ${line} ${tokens}');
 
-    w += tokens.fold<double>(0, (sum, item) => sum + item.sizeCurrent!.width);
+    double w = line.fold<double>(0, (sum, item) {
+      // print('_canAddNoHyphen: >> >' + item.runtimeType.toString() + '<');
+      // print('_canAddNoHyphen: >> >' + item.sizeCurrent!.width.toString() + '<');
+      // print(item.sizeCurrent == null ? 'currSize: NULL' : item.sizeCurrent);
+      // print(item.sizeHyphen == null ? 'currHyphen: NULL' : item.sizeHyphen);
+      // print(
+      //     item.sizeNoHyphen == null ? 'currNoHyphen: NULL' : item.sizeNoHyphen);
 
+      return sum + item.sizeCurrent!.width;
+    });
+
+    w += tokens.fold<double>(0, (sum, item) {
+      // print('_canAddNoHyphen: << >' + item.toString() + '<');
+      // print(item.sizeCurrent == null ? 'currSize: NULL' : item.sizeCurrent);
+      // print(item.sizeHyphen == null ? 'currHyphen: NULL' : item.sizeHyphen);
+      // print(
+      //     item.sizeNoHyphen == null ? 'currNoHyphen: NULL' : item.sizeNoHyphen);
+
+      return sum + item.sizeCurrent!.width;
+    });
+    // w += tokens.fold<double>(0, (sum, item) => sum + item.sizeCurrent!.width);
     return w <= _maxWidth;
   }
 

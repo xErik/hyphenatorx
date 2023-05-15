@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../src/token/tokens.dart';
+import 'tokens.dart';
 
 class WrapResult {
   final Text text;
@@ -18,7 +18,7 @@ class WrapResult {
 
   toString() {
     String ret = '>' + textStr.split('\n').join('<\n>') + '<';
-    // ret += '\n' + tokens.join('\n');
+    ret += '\n' + tokens.join('\n');
     ret += '\n' + size.toString() + ' vs. max-width: $maxWidth';
     ret += '\nfontSize: ${style.fontSize}';
     ret += '\nisSizeMatching: $isSizeMatching';
