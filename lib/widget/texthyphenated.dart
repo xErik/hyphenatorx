@@ -77,20 +77,28 @@ class _TextHyphenatedState extends State<TextHyphenated> {
           if (widget.doShowDebug == false) {
             return wrappedText;
           } else {
-            print(wrapped.toString());
+            // print(wrapped.sizeByText);
             return Stack(
               clipBehavior: Clip.none,
               children: [
                 Positioned(child: wrappedText),
                 Positioned(
                   right: 0,
-                  bottom: -35,
+                  bottom: -80,
                   child: Container(
-                      color: Colors.red.withAlpha(200),
+                      color: wrapped.isSizeMatching
+                          ? Colors.green.withAlpha(200)
+                          : Colors.red.withAlpha(200),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          Text('text-size: ' +
+                          Text(
+                              'is-match: ' + wrapped.isSizeMatching.toString()),
+                          Text('size-text : ' +
+                              wrapped.debugSizeByText.width.toString() +
+                              '/' +
+                              wrapped.debugSizeByText.height.toString()),
+                          Text('size-paint: ' +
                               wrapped.size.width.toString() +
                               '/' +
                               wrapped.size.height.toString()),

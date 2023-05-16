@@ -1,29 +1,64 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 abstract class TextPartToken {
   Size? sizeCurrent;
   Size? sizeHyphen;
   Size? sizeNoHyphen;
-  int get length;
   String render();
 }
 
-class TextTokens {
+class TextTokens extends TextPartToken {
   List<TextPartToken> parts;
   TextTokens(this.parts);
 
-  int get length => parts.fold<int>(0, (sum, item) => sum + item.length);
   toString() => parts.map<String>((e) => e.toString()).toList().toString();
   String render() => parts.map((e) => e.render()).join();
+
+  // @override
+  // Size get sizeCurrent {
+  //   double wMax = 0;
+  //   double hMax = 0;
+
+  //   double wLine = 0;
+  //   double hLine = 0;
+
+  //   for (final part in parts) {
+  //     if (part is WordToken || part is TabsAndSpacesToken) {
+  //       wLine += part.sizeCurrent!.width;
+  //       hLine = max(hLine, part.sizeCurrent!.height);
+  //     } else if (part is NewlineToken) {
+  //       wMax = max(wMax, wLine);
+  //       hMax = hMax + hLine;
+  //       wLine = 0;
+  //       hLine = 0;
+  //     }
+  //   }
+
+  //   return Size(wMax, hMax);
+  // }
 }
 
 class WordToken extends TextPartToken {
   List<WordPartToken> parts;
   WordToken(this.parts);
 
-  int get length => parts.fold<int>(0, (sum, item) => sum + item.length);
   toString() => parts.map((e) => e.toString()).toList().toString();
   String render() => parts.map((e) => e.render()).join();
+
+  @override
+  Size get sizeCurrent {
+    double w = 0;
+    double h = 0;
+
+    for (var part in parts) {
+      w += part.sizeCurrent!.width;
+      h = max(h, part.sizeCurrent!.height);
+    }
+
+    return Size(w, h);
+  }
 }
 
 /// Typically a syllable. But also a syllable preceed or followed by non-word
@@ -32,11 +67,7 @@ class WordPartToken extends TextPartToken {
   String text;
 
   WordPartToken(this.text);
-  int get length => text.length;
   toString() => text;
-  // toString() =>
-  //     text +
-  //     ' ${this.runtimeType} c:${sizeCurrent} h:${sizeHyphen} no-h:${sizeNoHyphen}';
   String render() => text;
   WordPartToken toHyphenAndSize(String hyphen) {
     final ret = WordPartToken(text + hyphen);
@@ -51,7 +82,6 @@ class WordPartToken extends TextPartToken {
 class TabsAndSpacesToken extends TextPartToken {
   String text;
   TabsAndSpacesToken(this.text);
-  int get length => text.length;
   toString() => 'WS';
   String render() => text;
 }
@@ -59,7 +89,6 @@ class TabsAndSpacesToken extends TextPartToken {
 /// Tabs and empty spaces combined into one. NOT soft-wrap whitespace.
 class NewlineToken extends TextPartToken {
   String text = '\n';
-  int get length => 0;
   toString() => 'NL';
   String render() => text;
 }

@@ -38,3 +38,8 @@
 
 - Removed `hyphenateTextAndBoundaries()`.
 - Added `hyphenateTextToTokens()`: Returns a tree of tokens inducating possible hyphenation.
+
+## 1.5.0
+
+- Added `WrapResult wrap()`: Returns a hyphenation result for a given width.
+- Added Hyphenation Widget.

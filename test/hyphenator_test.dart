@@ -145,21 +145,54 @@ _        _It_ _is_ _a_ _broader_ _term_ _than_     _"art",_ _which_ _as_ _a_ _de
         "[[A], WS, [vast], WS, [sub, di, vi, sion], WS, [of], WS, [cul, ture,], WS, NL, WS, [com, posed], WS, [of], WS, [many], WS, [cre, ative], WS, [endeav, ors], WS, [and], WS, [dis, ci, plines.]]");
   });
 
-  test('linewrapper', () {
+  test('linewrapper-100', () {
     final style = TextStyle(fontWeight: FontWeight.normal, fontSize: 14);
-    // final text = Text("""A vast subdivision of culture,
-    //     composed of many creative endeavors and disciplines.""");
-    // final maxWidth = 250.0;
-    final text = Text("""disciplines.""");
+    final text = Text(
+        """A vast subdivision of culture, composed of many creative endeavors and disciplines.""");
+    final expected = """A vast
+subdi-
+vision
+of cul-
+ture,
+com-
+posed
+of many
+cre-
+ative
+endeav-
+ors and
+disci-
+plines.""";
+
     final hyphenator = Hyphenator(config);
 
-    // WrapResult res = hyphenator.wrap(text, style, 75.0);
-    // expect(res.isSizeMatching, false);
-
     WrapResult res = hyphenator.wrap(text, style, 100.0);
-    print(res);
-    // expect(res.isSizeMatching, true);
+    // print(res.textStr);
+    expect(res.isSizeMatching, true);
+    expect(res.textStr, expected);
   });
+
+  test('linewrapper-380', () {
+    final style = TextStyle(fontWeight: FontWeight.normal, fontSize: 14);
+    final text = Text(
+        """A vast subdivision of culture, composed of many creative endeavors and disciplines.""");
+    final expected = """A vast subdivision of cul-
+ture, composed of many cre-
+ative endeavors and disci-
+plines.""";
+
+    final hyphenator = Hyphenator(config);
+
+    WrapResult res = hyphenator.wrap(text, style, 380.0);
+    // print(res.textStr);
+    expect(res.isSizeMatching, true);
+    expect(res.textStr, expected);
+  });
+
+//   [A, WS, vast, WS, sub, di, vi, sion, WS, of, WS, cul-, NL] width:364.0
+// [ture,, WS, com, posed, WS, of, WS, many, WS, cre-, NL] width:378.0
+// [ative, WS, endeav, ors, WS, and, WS, dis, ci-, NL] width:364.0
+// [plines.] width:98.0
 
   test('min letter count', () {
     final hyphenator = Hyphenator(

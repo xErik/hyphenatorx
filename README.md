@@ -2,6 +2,9 @@
 
 Implementation of an hyphenation algorithm.
 
+* Offers a `Widget` hyphenating a `String` and wrapping the result based on the available width.
+* Offers function calls to hyphenate a `String` at all possible positions. 
+
 The hyphen symbol can be defined, the default is the soft-wrap `'\u{00AD}'`.
 
 The `tex` patterns used in the algorithm can be found [here](https://tug.org/tex-hyphen/).
@@ -34,7 +37,7 @@ Available languages are given by the `enum Language`.
 
 **Cache**
 
-Internally, hyphenated as well as non-hyphenated words are cached. Complete texts are not cached, only single words.
+Internally, hyphenated as well as non-hyphenated words are cached. Complete texts are not cached.
 
 ### Asynchronous Instantiation
 
@@ -45,17 +48,16 @@ Or set a language code like `en_us`.
 ```dart
 import 'package:hyphenatorx/hyphenatorx.dart';
 import 'package:hyphenatorx/languages/language_en_us.dart';
-import 'package:hyphenatorx/languages/languageconfig.dart';
 
 final hyphernator = await Hyphenator.loadAsync(
     Language.language_en_us, 
-    hyphenateSymbol: '_');
+    symbol: '_');
 
 // OR THIS:
 
 final hyphernator = await Hyphenator.loadAsyncByAbbr(
     'en_us', 
-    hyphenateSymbol: '_');
+    symbol: '_');
 ```
 
 ### Synchronous Instantiation
@@ -65,19 +67,41 @@ Instatiate the appropriate `Language_XX()` object.
 ```dart 
 import 'package:hyphenatorx/hyphenatorx.dart';
 import 'package:hyphenatorx/languages/language_en_us.dart';
-import 'package:hyphenatorx/languages/languageconfig.dart';
 
-final LanguageConfig config = Language_en_us();
+final config = Language_en_us();
 
 final hyphenator = Hyphenator(
   config,
-  hyphenateSymbol: '_',
+  symbol: '_',
 );
 ```
 
-### Function
+### Widget Usage
+
+This Widget outputs a `Text`. It hyphenates and wraps the input `String` depending on the available width. 
+
+```dart 
+import 'package:hyphenatorx/texthyphenated.dart';
+
+TextHyphenated('subdivision', 
+  'en_us',
+  style: TextStyle(fontSize: 56))
+
+// Wraps the output according to the available width:
+// 
+// sub-
+// di-
+// vi-
+// sion
+```
+
+### Function Call
+
+Inject the hyphenation symbol at all possible positions.
 
 ```dart
+final hyphenator = Hyphenator(Language_en_us());
+
 expect(
   hyphenator.hyphenateText('subdivision subdivision', 
     hyphenAtBoundaries: true), 
@@ -93,17 +117,42 @@ expect(
 
 expect(
   hyphenator.syllablesWord('subdivision'),
-  ['sub', 'di', 'vi', 'sion']);
+  ['sub', 'di', 'vi', 'sion']);      
 ```
 
-Iterating through a token tree. Before and after each token
-a valid hyphen could be added, depending on availabel width.
+Access the wrapped hyphenation result respecting the given width.
+
+```dart
+final hyphenator = Hyphenator(Language_en_us());
+
+WrapResult wrap = hyphenator.wrap(
+  final Text text, final TextStyle style, final maxWidth);
+
+// The hyphenated text with hyphens and newlines:
+// 
+// sub-
+// di-
+// vi-
+// sion- 
+print( wrap.textStr ); 
+
+// Whether the returned text is equal to 
+// or smaller than maxWidth. 
+//
+// If FALSE, try a different font size.
+
+print( wrap.isSizeMatching );  
+```
+
+### Manual Hyphenation 
+
+Iterate through the token tree for a custom approach of hyphenation. Before and after each token a valid hyphen could be added. 
 
 ```dart
 final text = """A vast subdivision of culture, 
     composed of many creative endeavors and disciplines.""";
 
-final hyphenator = Hyphenator(config);
+final hyphenator = Hyphenator(Language_en_us());
 final TextTokens result = hyphenator.hyphenateTextToTokens(text);
 
 result.parts.forEach((part) {
@@ -113,42 +162,22 @@ result.parts.forEach((part) {
     print(part.text); // tabs and spaces found in `text`
   } else if (part is WordToken) {
     part.parts.forEach((syllableAndSurrounding) {
-      print(syllableAndSurrounding.text);
+      print(syllableAndSurrounding.text); // sub / di / vi / sion.
     });
   }
 });
 
 // A
-// 
 // vast
-// 
 // sub
 // di
 // vi
 // sion
-// ...
 ```
-
-### Widget 
-
-This is a convenience Widget, rendering a `Text`. The default symbol is the soft-wrap `\u{00AD}`.;
-
-```dart 
-import 'package:hyphenatorx/texthyphenated.dart';
-
-const TextHyphenated('subdivision', 'en_us', symbol: '@'),
-
-/// renders: sub@di@vi@sion
-
-const TextHyphenated('subdivision', 'en_us'),
-
-/// renders: subdivision with invisible soft wraps \u{00AD}
-```
-
 
 ## Languages and Abbreviations
 
-The abbreviations correspond with the `tex` file names [here](https://tug.org/tex-hyphen/).
+The abbreviations correspond with the `tex` file names found at [tug.org](https://tug.org/tex-hyphen/).
 
 ### Strings 
 

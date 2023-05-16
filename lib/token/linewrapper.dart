@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:hyphenatorx/src/token/texthelper.dart';
 
@@ -43,8 +44,8 @@ class LineWrapper {
         _setWidths(part.text, tokensWidthCache, part);
       } else if (part is NewlineToken) {
         part.sizeHyphen = const Size(0, 0);
-        part.sizeNoHyphen = part.sizeHyphen;
-        part.sizeCurrent = part.sizeHyphen;
+        part.sizeNoHyphen = const Size(0, 0);
+        part.sizeCurrent = const Size(0, 0);
       }
     }
 
@@ -86,63 +87,44 @@ class LineWrapper {
     List<TextPartToken> line = [];
 
     while (true) {
-      var currToken = _tokenIter.current();
+      var token = _tokenIter.current();
 
       // ------------------------------------------------------------
       // NEWLINE
       // ------------------------------------------------------------
-      if (currToken is NewlineToken) {
-        line.add(currToken);
+      if (token is NewlineToken) {
         _lines.add([NewlineToken()]);
         line.clear();
       } else
       // ------------------------------------------------------------
       // TABS AND SPACES
       // ------------------------------------------------------------
-      if (currToken is TabsAndSpacesToken && line.isNotEmpty) {
-        if (_canAddNoHyphen([currToken], line)) {
-          line.add(currToken);
+      if (token is TabsAndSpacesToken && line.isNotEmpty) {
+        if (_canAddNoHyphen([token], line)) {
+          line.add(token);
         } else {
-          _lines.add([...line]..add(NewlineToken()));
+          _lines.add(_cloneLineAndAddNewline(line));
           line.clear();
-          line.add(currToken);
         }
       } else
       // ------------------------------------------------------------
       // WORD
       // ------------------------------------------------------------
-      if (currToken is WordToken) {
-        final partLength = currToken.parts.length;
-        List<WordPartToken> prelist = [];
-        List<WordPartToken> postlist = [];
+      if (token is WordToken) {
+        // print('ADING WORD TO LINE');
+        bool trySuccess = _tryAddWordToLine(token, line);
 
-        for (int i = partLength; i > 0; i--) {
-          prelist = currToken.parts.sublist(0, i);
-          postlist = currToken.parts.sublist(i, partLength);
-          if (i == partLength && _canAddNoHyphen(prelist, line)) {
-            line.addAll([...prelist]); // add all word parts
-            prelist.clear();
-            postlist.clear();
-            break;
-          } else if (_canAddHyphenlast(prelist, line)) {
-            line.addAll(_doHyphenLast(prelist));
-            _lines.add([...line]..add(NewlineToken()));
+        if (trySuccess == false) {
+          // print('ADING WORD TO EMPTY LINE');
+          _lines.add(_cloneLineAndAddNewline(line));
+          line.clear();
+          trySuccess = _tryAddWordToLine(token, line);
+          if (trySuccess == false) {
+            // print('ADING WORD TO NEW EMPTY LINE -- FORCED');
+            _lines.add(_cloneLineAndAddNewline(line));
             line.clear();
-            line.addAll(postlist);
-            prelist.clear();
-            postlist.clear();
-            break;
           }
         }
-
-        // if (prelist.isNotEmpty || postlist.isNotEmpty) {
-        //   throw 'Cannot fit: $currToken in $_maxWidth px with fontSize ${_style.fontSize}';
-        // }
-
-        // if (line.isNotEmpty) {
-        //   _lines.add([...line]..add(NewlineToken()));
-        //   line.clear();
-        // }
       }
 
       // ------------------------------------------------------------
@@ -155,13 +137,8 @@ class LineWrapper {
         break;
       }
     }
-
     if (line.isNotEmpty) {
       _lines.add(line);
-    }
-
-    while (_lines.last.last is NewlineToken) {
-      _lines.last.removeLast();
     }
 
     final str =
@@ -169,37 +146,65 @@ class LineWrapper {
     _painter.text = TextSpan(text: str, style: _style);
     _painter.layout();
 
-    // print('=== RENDERED: $str ${_painter.size}');
-
-    return WrapResult(
+    final wrap = WrapResult(
         TextHelper.clone(_text, str), _style, _maxWidth, _painter.size, _lines);
+
+    if (kDebugMode) {
+      print('RENDERED lines   paint:\n${wrap.debugSizeOfLines}');
+      print('RENDERED string  paint:\n$str');
+      print('RENDERED size by paint: ${_painter.size}');
+      print('RENDERED size by token: ${wrap.debugSizeByText}');
+      print('RENDERED      maxWidth: ${wrap.maxWidth}');
+    }
+    return wrap;
+  }
+
+  bool _tryAddWordToLine(WordToken token, List<TextPartToken> line) {
+    final partLength = token.parts.length;
+    List<WordPartToken> prelist = [];
+    List<WordPartToken> postlist = [];
+
+    for (int i = partLength; i > 0; i--) {
+      prelist = token.parts.sublist(0, i);
+      postlist = token.parts.sublist(i, partLength);
+
+      if (i == partLength && _canAddNoHyphen(prelist, line)) {
+        line.addAll([...prelist]); // add all word parts
+        prelist.clear();
+        postlist.clear();
+        break;
+      } else if (_canAddHyphenlast(prelist, line)) {
+        line.addAll(_doHyphenLast(prelist));
+        _lines.add(_cloneLineAndAddNewline(line));
+        line.clear();
+        line.addAll(postlist);
+        prelist.clear();
+        postlist.clear();
+        break;
+      }
+    }
+    return prelist.isEmpty && postlist.isEmpty;
+  }
+
+  List<TextPartToken> _cloneLineAndAddNewline(List<TextPartToken> line) {
+    final clone = [...line];
+    while (clone.last is TabsAndSpacesToken) {
+      clone.removeLast();
+    }
+    clone.add(NewlineToken());
+    return clone;
   }
 
   bool _canAddNoHyphen(
       final List<TextPartToken> tokens, List<TextPartToken> line) {
-    // print('_canAddNoHyphen: ${line} ${tokens}');
-
     double w = line.fold<double>(0, (sum, item) {
-      // print('_canAddNoHyphen: >> >' + item.runtimeType.toString() + '<');
-      // print('_canAddNoHyphen: >> >' + item.sizeCurrent!.width.toString() + '<');
-      // print(item.sizeCurrent == null ? 'currSize: NULL' : item.sizeCurrent);
-      // print(item.sizeHyphen == null ? 'currHyphen: NULL' : item.sizeHyphen);
-      // print(
-      //     item.sizeNoHyphen == null ? 'currNoHyphen: NULL' : item.sizeNoHyphen);
-
       return sum + item.sizeCurrent!.width;
     });
 
     w += tokens.fold<double>(0, (sum, item) {
-      // print('_canAddNoHyphen: << >' + item.toString() + '<');
-      // print(item.sizeCurrent == null ? 'currSize: NULL' : item.sizeCurrent);
-      // print(item.sizeHyphen == null ? 'currHyphen: NULL' : item.sizeHyphen);
-      // print(
-      //     item.sizeNoHyphen == null ? 'currNoHyphen: NULL' : item.sizeNoHyphen);
-
       return sum + item.sizeCurrent!.width;
     });
-    // w += tokens.fold<double>(0, (sum, item) => sum + item.sizeCurrent!.width);
+
     return w <= _maxWidth;
   }
 
