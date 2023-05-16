@@ -43,3 +43,11 @@
 
 - Added `WrapResult wrap()`: Returns a hyphenation result for a given width.
 - Added Hyphenation Widget.
+
+## 1.5.1
+
+- Bugfix.
+
+## 1.5.2
+
+- Performance `hyphenateText()`.

@@ -189,10 +189,17 @@ plines.""";
     expect(res.textStr, expected);
   });
 
-//   [A, WS, vast, WS, sub, di, vi, sion, WS, of, WS, cul-, NL] width:364.0
-// [ture,, WS, com, posed, WS, of, WS, many, WS, cre-, NL] width:378.0
-// [ative, WS, endeav, ors, WS, and, WS, dis, ci-, NL] width:364.0
-// [plines.] width:98.0
+  test('linewrapper-empty', () {
+    final style = TextStyle(fontWeight: FontWeight.normal, fontSize: 14);
+    final text = Text("");
+    final expected = "";
+
+    final hyphenator = Hyphenator(config);
+
+    WrapResult res = hyphenator.wrap(text, style, 380.0);
+    expect(res.isSizeMatching, true);
+    expect(res.textStr, expected);
+  });
 
   test('min letter count', () {
     final hyphenator = Hyphenator(

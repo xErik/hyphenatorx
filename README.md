@@ -13,10 +13,40 @@ The package seems to work fine for western languages, other languages have to be
 
 A live Flutter demo: [https://xerik.github.io/hyphenatorx/](https://xerik.github.io/hyphenatorx/).
 
-## Installation
+## Quickstart
 
-```shell
-flutter pub add hyphenatorx
+```dart
+```dart 
+import 'package:hyphenatorx/texthyphenated.dart';
+
+// sub-
+// di-
+// vi-
+// sion
+TextHyphenated('subdivision', 
+  'en_us',
+  style: TextStyle(fontSize: 56))
+```
+
+```dart
+import 'package:hyphenatorx/hyphenatorx.dart';
+import 'package:hyphenatorx/languages/language_en_us.dart';
+
+final hyphenator = Hyphenator(Language_en_us(), symbol: '_');
+
+// 'sub_di_vi_sion_ _sub_di_vi_sion'
+print(
+  hyphenator.hyphenateText('subdivision subdivision', 
+    hyphenAtBoundaries: true));
+
+// sub_di_vi_sion sub_di_vi_sion
+print(hyphenator.hyphenateText('subdivision subdivision'));
+
+// sub_di_vi_sion
+print(hyphenator.hyphenateWord('subdivision'));
+
+// ['sub', 'di', 'vi', 'sion']
+print(hyphenator.syllablesWord('subdivision'));      
 ```
 
 ## Usage

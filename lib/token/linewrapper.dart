@@ -149,13 +149,13 @@ class LineWrapper {
     final wrap = WrapResult(
         TextHelper.clone(_text, str), _style, _maxWidth, _painter.size, _lines);
 
-    if (kDebugMode) {
-      print('RENDERED lines   paint:\n${wrap.debugSizeOfLines}');
-      print('RENDERED string  paint:\n$str');
-      print('RENDERED size by paint: ${_painter.size}');
-      print('RENDERED size by token: ${wrap.debugSizeByText}');
-      print('RENDERED      maxWidth: ${wrap.maxWidth}');
-    }
+    // if (kDebugMode) {
+    //   print('RENDERED lines   paint:\n${wrap.debugSizeOfLines}');
+    //   print('RENDERED string  paint:\n$str');
+    //   print('RENDERED size by paint: ${_painter.size}');
+    //   print('RENDERED size by token: ${wrap.debugSizeByText}');
+    //   print('RENDERED      maxWidth: ${wrap.maxWidth}');
+    // }
     return wrap;
   }
 
@@ -187,8 +187,8 @@ class LineWrapper {
   }
 
   List<TextPartToken> _cloneLineAndAddNewline(List<TextPartToken> line) {
-    final clone = [...line];
-    while (clone.last is TabsAndSpacesToken) {
+    List<TextPartToken> clone = [...line];
+    while (clone.isNotEmpty && clone.last is TabsAndSpacesToken) {
       clone.removeLast();
     }
     clone.add(NewlineToken());

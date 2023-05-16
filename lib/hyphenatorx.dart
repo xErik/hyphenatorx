@@ -132,9 +132,12 @@ class Hyphenator {
   /// [[The], WS, [arts], WS, [are], WS, [a], NL, [vast], WS, [sub, di, vi, sion], WS]
   ///
   TextTokens hyphenateTextToTokens(final String text) {
-    final hyph = hyphenateText(text);
-    final parts = hyph.replaceAll(r'\r', '').splitWithDelim(_split);
     final List<TextPartToken> partsResult = [];
+
+    final String hyph = hyphenateText(text); // this is expensive
+
+    final List<String> parts =
+        hyph.replaceAll(r'\r', '').splitWithDelim(_split);
 
     for (final part in parts) {
       if (part.isEmpty) {
@@ -204,17 +207,14 @@ class Hyphenator {
     }
     result.write(hyphenateWord(currentWord.toString()));
 
-    calc.logCache();
+    // calc.logCache();
 
     if (hyphenAtBoundaries == false) {
       return result.toString();
     } else {
       // Lazy method to add a hyphen symbol to word boundaries,
       // including punctuation etc. following or preceeding a syllable.
-      return hyphenateText(text)
-          .toString()
-          .splitWithDelim(_reBoundaries)
-          .join(calc.symbol);
+      return result.toString().splitWithDelim(_reBoundaries).join(calc.symbol);
     }
   }
 
