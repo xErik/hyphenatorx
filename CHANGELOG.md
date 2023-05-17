@@ -51,3 +51,7 @@
 ## 1.5.2
 
 - Performance `hyphenateText()`.
+
+## 1.5.3
+
+- Quality: checking letters of various alphabets (but alphabets may be incomplete).

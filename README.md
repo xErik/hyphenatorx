@@ -3,11 +3,9 @@
 Implementation of an hyphenation algorithm.
 
 * Offers a `Widget` hyphenating a `String` and wrapping the result based on the available width.
-* Offers function calls to hyphenate a `String` at all possible positions. 
+* Offers various function calls to hyphenate a `String` at all possible positions. 
 
-The hyphen symbol can be defined, the default is the soft-wrap `'\u{00AD}'`.
-
-The `tex` patterns used in the algorithm can be found [here](https://tug.org/tex-hyphen/).
+The `tex` patterns used in the algorithm can be at [tug.org](https://tug.org/tex-hyphen/).
 
 The package seems to work fine for western languages, other languages have to be evaluated.
 
@@ -15,7 +13,6 @@ A live Flutter demo: [https://xerik.github.io/hyphenatorx/](https://xerik.github
 
 ## Quickstart
 
-```dart
 ```dart 
 import 'package:hyphenatorx/texthyphenated.dart';
 
@@ -69,6 +66,10 @@ Available languages are given by the `enum Language`.
 
 Internally, hyphenated as well as non-hyphenated words are cached. Complete texts are not cached.
 
+**Hyphen symbol**
+
+The hyphen symbol can be defined, the default is the soft-wrap `'\u{00AD}'`.
+
 ### Asynchronous Instantiation
 
 Select the appropriate `Language.language_XX` value.
@@ -89,7 +90,7 @@ final hyphernator = await Hyphenator.loadAsyncByAbbr(
     'en_us', 
     symbol: '_');
 ```
-
+list of valid letters of all western alphabets, including grave, acute, circumflex and all other letter variations.
 ### Synchronous Instantiation
 
 Instatiate the appropriate `Language_XX()` object.
@@ -224,7 +225,23 @@ print(abbr);
 As Islandic is been abbreviated "is", which is a Dart keyword, the prefix "language" had been added.
 
 ```dart 
-enum Language { language_af,language_as,language_bg,language_bn,language_ca,language_cop,language_cs,language_cy,language_da,language_de_1901,language_de_1996,language_de_ch_1901,language_el_monoton,language_el_polyton,language_en_gb,language_en_us,language_eo,language_es,language_et,language_eu,language_fi,language_fr,language_fur,language_ga,language_gl,language_grc,language_gu,language_hi,language_hr,language_hsb,language_hu,language_hy,language_ia,language_id,language_is,language_it,language_ka,language_kmr,language_kn,language_la_x_classic,language_la,language_lt,language_lv,language_ml,language_mn_cyrl_x_lmc,language_mn_cyrl,language_mr,language_mul_ethi,language_nb,language_nl,language_nn,language_or,language_pa,language_pl,language_pms,language_pt,language_rm,language_ro,language_ru,language_sa,language_sh_cyrl,language_sk,language_sl,language_sv,language_ta,language_te,language_th,language_tk,language_tr,language_uk,language_zh_latn_pinyin }
+enum Language { language_af,language_as,language_bg,language_bn,
+language_ca,language_cop,language_cs,language_cy,language_da,
+language_de_1901,language_de_1996,language_de_ch_1901,
+language_el_monoton,language_el_polyton,language_en_gb
+language_en_us,language_eo,language_es,language_et,
+language_eu,language_fi,language_fr,language_fur,language_ga,
+language_gl,language_grc,language_gu,language_hi,language_hr,
+language_hsb,language_hu,language_hy,language_ia,language_id,
+language_is,language_it,language_ka,language_kmr,language_kn,
+language_la_x_classic,language_la,language_lt,language_lv,
+language_ml,language_mn_cyrl_x_lmc,language_mn_cyrl,language_mr,
+language_mul_ethi,language_nb,language_nl,language_nn,
+language_or,language_pa,language_pl,language_pms,language_pt,
+language_rm,language_ro,language_ru,language_sa,language_sh_cyrl,
+language_sk,language_sl,language_sv,language_ta,language_te,
+language_th,language_tk,language_tr,language_uk,
+language_zh_latn_pinyin }
 ```
 
 ## Performance
@@ -232,36 +249,13 @@ enum Language { language_af,language_as,language_bg,language_bn,language_ca,lang
 Old machine:
 
 * Instantiation via Dart EN_US file: 30 milliseconds
-* Hyphenating text with 258 words: 46 milliseconds
+* Hyphenating text with 258 words: 46-56 milliseconds
 
-Internal testing whether a character is a letter impacts performance the most.
-
-```dart
-// FORMER
-//
-// Results in 54 milliseconds for long text.
-//
-// final isLetter = (c == c.toLowerCase() && c == c.toUpperCase()) == false;
-
-// BETTER
-//
-// Results in 46 milliseconds for long text.
-// Reduction by 15 %.
-//
-// final isLetter = textLower[i] != textUpper[i];
-
-// INCREASE, but most precise?
-//
-// Results in 80 milliseconds for long text.
-// Increase by 48 %.
-//
-// final reLetter = RegExp(r'\p{Letter}', unicode: true);
-// final isLetter = reLetter.hasMatch(c);
-```
+Internal is-letter-testing impacts performance the most. At the moment, a binary search is performed over a combined set of (complete?) alphabets from various languages, plus an extra check for languages not included. Not terrible efficient, needs improvement.
 
 ## Generate JSON and Dart files
 
-```
+```shell
 dart run ./tool/tex2dart.dart
 ```
 
@@ -272,7 +266,6 @@ The tool will delete `assets` and `lib/languages` before generating new files. I
 This package is a copy and extension of [hyphenator](https://pub.dev/packages/hyphenator).
 
 
-## Outlook
+## Issues
 
-* Implementing real hyphenation with hyphenations ending in `-`?
-* Performance improvement.
+Given this is a generic hyphenator, several issues are to be expected. Please open one at [Github](https://github.com/xErik/hyphenatorx/issues).

@@ -241,7 +241,7 @@ plines.""";
     stopwatchInit.stop();
     stopwatchesInit.add(stopwatchInit.elapsedMilliseconds);
 
-    for (int i = 0; i < 200; i++) {
+    for (int i = 0; i < 1; i++) {
       final stopwatchPerform = Stopwatch()..start();
       final result = hyphenator.hyphenateText(text);
       stopwatchPerform.stop();

@@ -11,6 +11,7 @@ class CalculationHelper {
   final int _minLetterCount;
   final int _minWordLength;
   final String symbol;
+  final String hyphen;
   final Map<String, String> cacheHyphendWords = {};
   final Map<String, String> cacheNonHyphendWords = {};
   final Map<String, List<String>> cacheHyphenateSyllables = {};
@@ -21,7 +22,7 @@ class CalculationHelper {
   // final Map<String, List<int>> _cacheCorrectHyphenationMask = {};
 
   CalculationHelper(this._patterns, this._exceptions, this._minLetterCount,
-      this._minWordLength, this.symbol);
+      this._minWordLength, this.symbol, this.hyphen);
 
   void logCache() {
     if (kDebugMode) {

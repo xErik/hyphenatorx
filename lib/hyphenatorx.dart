@@ -3,6 +3,7 @@ import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:hyphenatorx/src/calculationhelper.dart';
 import 'package:hyphenatorx/src/extensions.dart';
+import 'package:hyphenatorx/src/letterutil.dart';
 import 'package:hyphenatorx/token/tokens.dart';
 
 import 'languages/languageconfig.dart';
@@ -40,12 +41,14 @@ class Hyphenator {
   static Future<Hyphenator> loadAsyncByAbbr(
     final String lang, {
     final String symbol = '\u{00AD}',
+    final String hyphen = '-',
     final int minWordLength = 5,
     final int minLetterCount = 3,
   }) async {
     return Hyphenator(
       await LanguageConfig.load(getLanguageEnum(lang)),
       symbol: symbol,
+      hyphen: hyphen,
       minWordLength: minWordLength,
       minLetterCount: minLetterCount,
     );
@@ -56,12 +59,14 @@ class Hyphenator {
   static Future<Hyphenator> loadAsync(
     final Language lang, {
     final String symbol = '\u{00AD}',
+    final String hyphen = '-',
     final int minWordLength = 5,
     final int minLetterCount = 3,
   }) async {
     return Hyphenator(
       await LanguageConfig.load(lang),
       symbol: symbol,
+      hyphen: hyphen,
       minWordLength: minWordLength,
       minLetterCount: minLetterCount,
     );
@@ -72,6 +77,7 @@ class Hyphenator {
   Hyphenator(
     final LanguageConfig config, {
     final String symbol = '\u{00AD}',
+    final String hyphen = '-',
     final int minWordLength = 5,
     final int minLetterCount = 3,
   }) {
@@ -94,7 +100,7 @@ class Hyphenator {
     );
 
     calc = CalculationHelper(
-        patterns, exceptions, minLetterCount, minWordLength, symbol);
+        patterns, exceptions, minLetterCount, minWordLength, symbol, hyphen);
   }
 
   /// Returns cached and hyphenated words.
@@ -109,7 +115,7 @@ class Hyphenator {
   /// [WrapResult] holds a [Text] with the correctly hyphened [String].
   WrapResult wrap(final Text text, final TextStyle style, final maxWidth) {
     final tokens = hyphenateTextToTokens(text.data!);
-    final wrapper = LineWrapper(tokens, text, style, maxWidth);
+    final wrapper = LineWrapper(tokens, text, style, maxWidth, calc.hyphen);
     return wrapper.render();
   }
 
@@ -177,20 +183,14 @@ class Hyphenator {
       final c = text[i];
 
       // FORMER
-      // Results in 54 milliseconds for long test text
       //
       // final isLetter = (c == c.toLowerCase() && c == c.toUpperCase()) == false;
       //
       // GOOD
-      // Results in 46 milliseconds for long test text.
-      // Reduction by 15 %.
       //
-      final isLetter = textLower[i] != textUpper[i];
+      bool isLetter = LetterUtil.isLetter(c) || textLower[i] != textUpper[i];
       //
       // SO SO
-      //
-      // Results in 80 milliseconds for long test text.
-      // Increase by 48 %.
       //
       // final isLetter = reLetter.hasMatch(c);
 

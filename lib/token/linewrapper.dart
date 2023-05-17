@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:hyphenatorx/src/token/texthelper.dart';
 
@@ -11,7 +10,7 @@ import 'wrapresult.dart';
 /// Hyphenates tokens with respect to the attributes of
 /// [Text], [TextStyle] and [maxWidth].
 class LineWrapper {
-  final String _hyphen = '-';
+  final String _hyphen;
   late final double _maxWidth;
   final List<List<TextPartToken>> _lines = [];
   late final TextPainter _painter;
@@ -21,7 +20,8 @@ class LineWrapper {
   final Text _text;
 
   /// Constructor.
-  LineWrapper(TextTokens tokens, this._text, this._style, this._maxWidth) {
+  LineWrapper(TextTokens tokens, this._text, this._style, this._maxWidth,
+      this._hyphen) {
     final Map<String, Size> tokensWidthCache = {};
     _tokenIter = TokenIterator(tokens);
 
