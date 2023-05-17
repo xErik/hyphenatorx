@@ -111,18 +111,23 @@ class LineWrapper {
       // WORD
       // ------------------------------------------------------------
       if (token is WordToken) {
-        // print('ADING WORD TO LINE');
+        // print('ADING WORD TO LINE: $token');
         bool trySuccess = _tryAddWordToLine(token, line);
 
         if (trySuccess == false) {
           // print('ADING WORD TO EMPTY LINE');
-          _lines.add(_cloneLineAndAddNewline(line));
-          line.clear();
+          if (line.isNotEmpty) {
+            _lines.add(_cloneLineAndAddNewline(line));
+            line.clear();
+          }
           trySuccess = _tryAddWordToLine(token, line);
           if (trySuccess == false) {
             // print('ADING WORD TO NEW EMPTY LINE -- FORCED');
-            _lines.add(_cloneLineAndAddNewline(line));
-            line.clear();
+            if (line.isNotEmpty) {
+              _lines.add(_cloneLineAndAddNewline(line));
+              line.clear();
+            }
+            line.add(token);
           }
         }
       }
@@ -137,6 +142,7 @@ class LineWrapper {
         break;
       }
     }
+
     if (line.isNotEmpty) {
       _lines.add(line);
     }

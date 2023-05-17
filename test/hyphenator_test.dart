@@ -68,6 +68,28 @@ void main() {
     expect(hyphenator.hyphenateWord('disciplines'), 'dis_ci_plines');
   });
 
+  // I/flutter (18312): SIZE Size(350.0, 720.0)
+// I/flutter (18312): >hello<
+// [log] font:null/163.0pt | inner:349.0/191.0 | outer:350.0/720.0 | steps:8 | StrategyNonHyphenate
+
+  test('wrap-word-too-big', () {
+    final str = 'hello';
+    final hyphenator = Hyphenator(config);
+
+    expect(hyphenator.hyphenateWord(str), str);
+
+    // var wrap = hyphenator.wrap(Text(str), TextStyle(fontSize: 56), 350.0);
+    // // print(wrap);
+    // expect(wrap.textStr, str);
+    // expect(wrap.size, Size(280, 56));
+    // expect(wrap.isSizeMatching, true);
+
+    final wrap = hyphenator.wrap(Text(str), TextStyle(fontSize: 500), 350.0);
+    expect(wrap.textStr, str);
+    expect(wrap.size, Size(2500, 500));
+    expect(wrap.isSizeMatching, false);
+  });
+
   test('hyphenate word to list', () {
     final hyphenator = Hyphenator(
       config,
@@ -111,6 +133,15 @@ void main() {
     );
 
     expect(hyphenator.hyphenateText(text), expectedText);
+  });
+
+  test('text-empty', () {
+    final hyphenator = Hyphenator(
+      config,
+      symbol: '-',
+    );
+
+    expect(hyphenator.hyphenateText(''), '');
   });
 
   test('text-with-boundaries', () {

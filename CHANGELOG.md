@@ -55,3 +55,7 @@
 ## 1.5.3
 
 - Quality: checking letters of various alphabets (but alphabets may be incomplete).
+
+## 1.5.4
+
+- Bugfix: Word too big for `wrap()`.
