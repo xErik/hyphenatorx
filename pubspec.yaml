@@ -20,3 +20,8 @@ dev_dependencies:
 flutter:
   assets:
     - assets/
+
+  fonts:
+    - family: roboto
+      fonts:
+        - asset: test/Roboto-Regular.ttf

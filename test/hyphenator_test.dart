@@ -1,6 +1,7 @@
 import 'dart:math' as Math show min, max;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hyphenatorx/hyphenatorx.dart';
 import 'package:hyphenatorx/languages/language_en_us.dart';
@@ -16,6 +17,14 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   final LanguageConfig config = Language_en_us();
+
+  const sRoboto = TextStyle(fontFamily: 'roboto');
+
+  setUpAll(() async {
+    final Future<ByteData> data = rootBundle.load('test/Roboto-Regular.ttf');
+    final FontLoader fontLoader = FontLoader('roboto')..addFont(data);
+    await fontLoader.load();
+  });
 
   test('soft-hyphen', () async {
     final hyphend = Hyphenator(config).hyphenateWord('subdivision');
@@ -78,15 +87,14 @@ void main() {
 
     expect(hyphenator.hyphenateWord(str), str);
 
-    // var wrap = hyphenator.wrap(Text(str), TextStyle(fontSize: 56), 350.0);
-    // // print(wrap);
-    // expect(wrap.textStr, str);
-    // expect(wrap.size, Size(280, 56));
-    // expect(wrap.isSizeMatching, true);
-
-    final wrap = hyphenator.wrap(Text(str), TextStyle(fontSize: 500), 350.0);
+    final wrap = hyphenator.wrap(
+        Text(
+          str,
+        ),
+        TextStyle(fontSize: 500).merge(sRoboto),
+        350.0);
     expect(wrap.textStr, str);
-    expect(wrap.size, Size(2500, 500));
+    expect(wrap.size, Size(1069.0, 600.0));
     expect(wrap.isSizeMatching, false);
   });
 
@@ -177,23 +185,16 @@ _        _It_ _is_ _a_ _broader_ _term_ _than_     _"art",_ _which_ _as_ _a_ _de
   });
 
   test('linewrapper-100', () {
-    final style = TextStyle(fontWeight: FontWeight.normal, fontSize: 14);
+    final style =
+        TextStyle(fontWeight: FontWeight.normal, fontSize: 14).merge(sRoboto);
     final text = Text(
         """A vast subdivision of culture, composed of many creative endeavors and disciplines.""");
-    final expected = """A vast
-subdi-
-vision
-of cul-
-ture,
-com-
-posed
-of many
-cre-
-ative
-endeav-
-ors and
-disci-
-plines.""";
+    final expected = """A vast subdivi-
+sion of culture,
+composed of
+many creative
+endeavors and
+disciplines.""";
 
     final hyphenator = Hyphenator(config);
 
@@ -203,25 +204,27 @@ plines.""";
     expect(res.textStr, expected);
   });
 
-  test('linewrapper-380', () {
-    final style = TextStyle(fontWeight: FontWeight.normal, fontSize: 14);
+  test('linewrapper-160', () {
+    final style =
+        TextStyle(fontWeight: FontWeight.normal, fontSize: 14).merge(sRoboto);
     final text = Text(
         """A vast subdivision of culture, composed of many creative endeavors and disciplines.""");
-    final expected = """A vast subdivision of cul-
-ture, composed of many cre-
-ative endeavors and disci-
-plines.""";
+    final expected = """A vast subdivision of
+culture, composed of
+many creative endeavors
+and disciplines.""";
 
     final hyphenator = Hyphenator(config);
 
-    WrapResult res = hyphenator.wrap(text, style, 380.0);
+    WrapResult res = hyphenator.wrap(text, style, 160.0);
     // print(res.textStr);
     expect(res.isSizeMatching, true);
     expect(res.textStr, expected);
   });
 
   test('linewrapper-empty', () {
-    final style = TextStyle(fontWeight: FontWeight.normal, fontSize: 14);
+    final style =
+        TextStyle(fontWeight: FontWeight.normal, fontSize: 14).merge(sRoboto);
     final text = Text("");
     final expected = "";
 

@@ -59,3 +59,7 @@
 ## 1.5.4
 
 - Bugfix: Word too big for `wrap()`.
+
+## 1.5.5
+
+- Unit Tests.
