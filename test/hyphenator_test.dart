@@ -18,12 +18,21 @@ void main() {
 
   final LanguageConfig config = Language_en_us();
 
-  const sRoboto = TextStyle(fontFamily: 'roboto');
+  late TextStyle sRoboto; // = const TextStyle();
 
   setUpAll(() async {
     final Future<ByteData> data = rootBundle.load('test/Roboto-Regular.ttf');
     final FontLoader fontLoader = FontLoader('roboto')..addFont(data);
     await fontLoader.load();
+
+    sRoboto = TextStyle(
+      fontFamily: 'Roboto',
+      // fontSize: 100,
+      fontWeight: FontWeight.w400,
+      textBaseline: TextBaseline.alphabetic,
+      decoration: TextDecoration.none,
+      height: 1.17,
+    );
   });
 
   test('soft-hyphen', () async {
@@ -94,7 +103,7 @@ void main() {
         TextStyle(fontSize: 500).merge(sRoboto),
         350.0);
     expect(wrap.textStr, str);
-    expect(wrap.size, Size(1069.0, 600.0));
+    expect(wrap.size, Size(1069.0, 585.0));
     expect(wrap.isSizeMatching, false);
   });
 

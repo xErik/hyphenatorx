@@ -63,3 +63,4 @@
 ## 1.5.5
 
 - Unit Tests.
+- WrapResult: attribute `textStr` to getter.

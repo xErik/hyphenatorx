@@ -6,7 +6,6 @@ import 'tokens.dart';
 
 class WrapResult {
   final Text text;
-  late final String textStr;
   final TextStyle style;
   final double maxWidth;
   final Size size;
@@ -14,9 +13,12 @@ class WrapResult {
   late final bool isSizeMatching;
 
   WrapResult(this.text, this.style, this.maxWidth, this.size, this.tokens) {
-    textStr = text.data!;
     isSizeMatching = size.width <= maxWidth;
   }
+
+  /// Get the String content from Text.
+  /// Convenience method.
+  String get textStr => text.data!;
 
   toString() {
     String ret = '>' + textStr.split('\n').join('<\n>') + '<';
