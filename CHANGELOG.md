@@ -64,3 +64,8 @@
 
 - Unit Tests.
 - WrapResult: attribute `textStr` to getter.
+
+## 1.5.6 
+
+- Unit Tests.
+- Removed `TextTokens`.

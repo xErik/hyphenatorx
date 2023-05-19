@@ -1,21 +1,22 @@
 import 'dart:core';
 
 import 'package:flutter/material.dart';
-import 'package:hyphenatorx/src/calculationhelper.dart';
 import 'package:hyphenatorx/src/extensions.dart';
-import 'package:hyphenatorx/src/letterutil.dart';
-import 'package:hyphenatorx/token/tokens.dart';
 
 import 'languages/languageconfig.dart';
+import 'src/calculationhelper.dart';
+import 'src/letterutil.dart';
 import 'src/pattern.dart';
-import 'token/linewrapper.dart';
+import 'token/linewrapperhyphen.dart';
+import 'token/linewrappernohyphen.dart';
+import 'token/tokens.dart';
 import 'token/wrapresult.dart';
 
 /// Wrapper class hyphenating text.
 class Hyphenator {
   late final CalculationHelper calc;
-  final RegExp _reBoundaries = RegExp(r'[\t\ ]+');
-  final RegExp _split = RegExp(r'\n|[\t ]+');
+  static final RegExp _reBoundaries = RegExp(r'[\t\ ]+');
+  static final RegExp _split = RegExp(r'\n|[\t ]+');
 
   static Language getLanguageEnum(String lang) {
     Language l;
@@ -115,7 +116,32 @@ class Hyphenator {
   /// [WrapResult] holds a [Text] with the correctly hyphened [String].
   WrapResult wrap(final Text text, final TextStyle style, final maxWidth) {
     final tokens = hyphenateTextToTokens(text.data!);
-    final wrapper = LineWrapper(tokens, text, style, maxWidth, calc.hyphen);
+    final wrapper =
+        LineWrapperHyphen(tokens, text, style, maxWidth, calc.hyphen);
+    return wrapper.render();
+  }
+
+  /// Service method to wrap a text but perform no hyphenation.
+  static WrapResult wrapNoHyphen(
+      final Text text, final TextStyle style, final double maxWidth) {
+    final List<TextPartToken> tokens = [];
+
+    final List<String> parts =
+        text.data!.replaceAll(reR, '').splitWithDelim(_split);
+
+    for (final part in parts) {
+      if (part.isEmpty) {
+        // hu?!
+      } else if (part == '\n') {
+        tokens.add(NewlineToken());
+      } else if (part.trim().isEmpty) {
+        tokens.add(TabsAndSpacesToken(part));
+      } else {
+        tokens.add(WordToken([WordPartToken(part)]));
+      }
+    }
+    // print(tokens);
+    final wrapper = LineWrapperNoHyphen(tokens, text, style, maxWidth);
     return wrapper.render();
   }
 
@@ -137,31 +163,31 @@ class Hyphenator {
   ///
   /// [[The], WS, [arts], WS, [are], WS, [a], NL, [vast], WS, [sub, di, vi, sion], WS]
   ///
-  TextTokens hyphenateTextToTokens(final String text) {
-    final List<TextPartToken> partsResult = [];
+  static final reR = RegExp(r'\r');
+  List<TextPartToken> hyphenateTextToTokens(final String text) {
+    final List<TextPartToken> tokens = [];
 
     final String hyph = hyphenateText(text); // this is expensive
 
-    final List<String> parts =
-        hyph.replaceAll(r'\r', '').splitWithDelim(_split);
+    final List<String> parts = hyph.replaceAll(reR, '').splitWithDelim(_split);
 
     for (final part in parts) {
       if (part.isEmpty) {
         // hu?!
       } else if (part == '\n') {
-        partsResult.add(NewlineToken());
+        tokens.add(NewlineToken());
       } else if (part.trim().isEmpty) {
-        partsResult.add(TabsAndSpacesToken(part));
+        tokens.add(TabsAndSpacesToken(part));
       } else {
         // Word
-        partsResult.add(WordToken(part
+        tokens.add(WordToken(part
             .split(calc.symbol)
             .map<WordPartToken>((e) => WordPartToken(e))
             .toList(growable: false)));
       }
     }
 
-    return TextTokens(partsResult);
+    return tokens;
   }
 
   /// Hyphenates a text.

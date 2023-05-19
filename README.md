@@ -9,7 +9,12 @@ The `tex` patterns used in the algorithm can be at [tug.org](https://tug.org/tex
 
 The package seems to work fine for western languages, other languages have to be evaluated.
 
-A live Flutter demo: [https://xerik.github.io/hyphenatorx/](https://xerik.github.io/hyphenatorx/).
+Test the live demo [https://xerik.github.io/hyphenatorx/](https://xerik.github.io/hyphenatorx/).
+
+**Wrapping and Scaling Text**
+
+The package [text_wrap_auto_size](https://pub.dev/packages/text_wrap_auto_size) uses
+`hyphenatorx` for wrapping and auto scaling text - with and without hyphenation.
 
 ## Quickstart
 
@@ -184,9 +189,9 @@ final text = """A vast subdivision of culture,
     composed of many creative endeavors and disciplines.""";
 
 final hyphenator = Hyphenator(Language_en_us());
-final TextTokens result = hyphenator.hyphenateTextToTokens(text);
+final List<TextPartToken> tokens = hyphenator.hyphenateTextToTokens(text);
 
-result.parts.forEach((part) {
+tokens.forEach((part) {
   if (part is NewlineToken) {
     print(part.text); // = is always a single newline
   } else if (part is TabsAndSpacesToken) {

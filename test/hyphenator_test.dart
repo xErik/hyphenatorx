@@ -17,8 +17,7 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   final LanguageConfig config = Language_en_us();
-
-  late TextStyle sRoboto; // = const TextStyle();
+  late TextStyle sRoboto;
 
   setUpAll(() async {
     final Future<ByteData> data = rootBundle.load('test/Roboto-Regular.ttf');
@@ -27,13 +26,17 @@ void main() {
 
     sRoboto = TextStyle(
       fontFamily: 'Roboto',
-      // fontSize: 100,
+      fontSize: 14,
       fontWeight: FontWeight.w400,
       textBaseline: TextBaseline.alphabetic,
       decoration: TextDecoration.none,
       height: 1.17,
     );
   });
+
+  // -------------------------------------------------------------------
+  // General tests
+  // -------------------------------------------------------------------
 
   test('soft-hyphen', () async {
     final hyphend = Hyphenator(config).hyphenateWord('subdivision');
@@ -45,12 +48,18 @@ void main() {
     expect(abbr.contains('en_us'), true);
   });
 
-  test('loadAsync', () async {
-    final hyphenator = await Hyphenator.loadAsync(
-      Language.language_en_us,
-      symbol: '_',
-    );
+  test('exceptions', () {
+    final hyphenator = Hyphenator(config, symbol: '_');
+    expect(hyphenator.hyphenateText('philanthropic'), 'phil_an_thropic');
+  });
 
+  // -------------------------------------------------------------------
+  // load()
+  // -------------------------------------------------------------------
+
+  test('loadAsync', () async {
+    final hyphenator =
+        await Hyphenator.loadAsync(Language.language_en_us, symbol: '_');
     expect(hyphenator.hyphenateText('subdivision'), 'sub_di_vi_sion');
     expect(hyphenator.hyphenateText('creative'), 'cre_ative');
     expect(hyphenator.hyphenateText('disciplines'), 'dis_ci_plines');
@@ -58,24 +67,27 @@ void main() {
 
   test('loadAsyncByAbbr', () async {
     final hyphenator = await Hyphenator.loadAsyncByAbbr('en_us', symbol: '_');
-
     expect(hyphenator.hyphenateText('subdivision'), 'sub_di_vi_sion');
     expect(hyphenator.hyphenateText('creative'), 'cre_ative');
     expect(hyphenator.hyphenateText('disciplines'), 'dis_ci_plines');
   });
 
-  test('patterns', () {
-    final hyphenator = Hyphenator(
-      config,
-      symbol: '_',
-    );
+  // -------------------------------------------------------------------
+  // hyphenateText()
+  // -------------------------------------------------------------------
 
+  test('hyphenate-text', () {
+    final hyphenator = Hyphenator(config, symbol: '_');
     expect(hyphenator.hyphenateText('subdivision'), 'sub_di_vi_sion');
     expect(hyphenator.hyphenateText('creative'), 'cre_ative');
     expect(hyphenator.hyphenateText('disciplines'), 'dis_ci_plines');
   });
 
-  test('hyphenate word', () {
+  // -------------------------------------------------------------------
+  // hyphenateWord()
+  // -------------------------------------------------------------------
+
+  test('hyphenate-word', () {
     final hyphenator = Hyphenator(
       config,
       symbol: '_',
@@ -86,32 +98,12 @@ void main() {
     expect(hyphenator.hyphenateWord('disciplines'), 'dis_ci_plines');
   });
 
-  // I/flutter (18312): SIZE Size(350.0, 720.0)
-// I/flutter (18312): >hello<
-// [log] font:null/163.0pt | inner:349.0/191.0 | outer:350.0/720.0 | steps:8 | StrategyNonHyphenate
+  // -------------------------------------------------------------------
+  // syllablesWord()
+  // -------------------------------------------------------------------
 
-  test('wrap-word-too-big', () {
-    final str = 'hello';
-    final hyphenator = Hyphenator(config);
-
-    expect(hyphenator.hyphenateWord(str), str);
-
-    final wrap = hyphenator.wrap(
-        Text(
-          str,
-        ),
-        TextStyle(fontSize: 500).merge(sRoboto),
-        350.0);
-    expect(wrap.textStr, str);
-    expect(wrap.size, Size(1069.0, 585.0));
-    expect(wrap.isSizeMatching, false);
-  });
-
-  test('hyphenate word to list', () {
-    final hyphenator = Hyphenator(
-      config,
-      symbol: '_',
-    );
+  test('hyphenate-word-to-syllables', () {
+    final hyphenator = Hyphenator(config, symbol: '_');
 
     expect(hyphenator.syllablesWord('subdivision'),
         <String>['sub', 'di', 'vi', 'sion']);
@@ -120,11 +112,8 @@ void main() {
         <String>['dis', 'ci', 'plines']);
   });
 
-  test('hyphenate word to list, punctuation', () {
-    final hyphenator = Hyphenator(
-      config,
-      symbol: '_',
-    );
+  test('hyphenate-word-to-syllables-punctuation', () {
+    final hyphenator = Hyphenator(config, symbol: '_');
 
     expect(hyphenator.syllablesWord('"subdivision"'),
         <String>['"sub', 'di', 'vi', 'sion"']);
@@ -134,34 +123,21 @@ void main() {
         <String>['dis', 'ci', 'plines,']);
   });
 
-  test('exceptions', () {
-    final hyphenator = Hyphenator(
-      config,
-      symbol: '_',
-    );
+  // -------------------------------------------------------------------
+  // hyphenateTex()
+  // -------------------------------------------------------------------
 
-    expect(hyphenator.hyphenateText('philanthropic'), 'phil_an_thropic');
-  });
-
-  test('text', () {
-    final hyphenator = Hyphenator(
-      config,
-      symbol: '-',
-    );
-
+  test('hyphenate-text', () {
+    final hyphenator = Hyphenator(config, symbol: '-');
     expect(hyphenator.hyphenateText(text), expectedText);
   });
 
-  test('text-empty', () {
-    final hyphenator = Hyphenator(
-      config,
-      symbol: '-',
-    );
-
+  test('hyphenate-text-empty', () {
+    final hyphenator = Hyphenator(config, symbol: '-');
     expect(hyphenator.hyphenateText(''), '');
   });
 
-  test('text-with-boundaries', () {
+  test('hyphenate-text-boundaries', () {
     final text =
         """The arts are a vast subdivision of culture, composed of many creative endeavors and disciplines. 
 
@@ -174,15 +150,16 @@ void main() {
 
 _        _It_ _is_ _a_ _broader_ _term_ _than_     _"art",_ _which_ _as_ _a_ _descrip_tion_ _of_ _a_ _field_ _usu_ally_ _means_ _only_ _the_ _visual_ _arts.""";
 
-    final hyphenator = Hyphenator(
-      config,
-      symbol: '_',
-    );
+    final hyphenator = Hyphenator(config, symbol: '_');
     expect(
         hyphenator.hyphenateText(text, hyphenAtBoundaries: true), expectedText);
   });
 
-  test('text-as-tokens', () {
+  // -------------------------------------------------------------------
+  // hyphenateTextToTokens()
+  // -------------------------------------------------------------------
+
+  test('hyphenate-text-to-tokens', () {
     final text = """A vast subdivision of culture, 
         composed of many creative endeavors and disciplines.""";
 
@@ -193,7 +170,54 @@ _        _It_ _is_ _a_ _broader_ _term_ _than_     _"art",_ _which_ _as_ _a_ _de
         "[[A], WS, [vast], WS, [sub, di, vi, sion], WS, [of], WS, [cul, ture,], WS, NL, WS, [com, posed], WS, [of], WS, [many], WS, [cre, ative], WS, [endeav, ors], WS, [and], WS, [dis, ci, plines.]]");
   });
 
-  test('linewrapper-100', () {
+  test('hyphenate-wrapNoHyphen', () {
+    final text = Text("""A vast subdivision of culture, 
+        composed of many creative endeavors and disciplines.""");
+    final expected = """A vast
+subdivision of
+culture,
+composed of
+many creative
+endeavors and
+disciplines.""";
+
+    final WrapResult wrap = Hyphenator.wrapNoHyphen(text, sRoboto, 100);
+    expect(wrap.textStr, expected);
+  });
+
+  // -------------------------------------------------------------------
+  // wrap()
+  // -------------------------------------------------------------------
+
+  test('wrap-word-too-big', () {
+    final str = 'hello';
+    final styleBig = sRoboto.merge(TextStyle(fontSize: 500));
+    final hyphenator = Hyphenator(config);
+    final wrap = hyphenator.wrap(Text(str), styleBig, 350.0);
+    expect(wrap.textStr, str);
+    expect(wrap.size, Size(1069.0, 585.0));
+    expect(wrap.isSizeMatching, false);
+  });
+
+  test('wrap-one-word', () {
+    final str = 'hello';
+    final hyphenator = Hyphenator(config);
+    final wrap = hyphenator.wrap(Text(str), sRoboto, 360.0);
+    expect(wrap.textStr, str);
+    expect(wrap.size, Size(30, 16));
+    expect(wrap.isSizeMatching, true);
+  });
+
+  test('wrap-two-words', () {
+    final str = 'hello hello';
+    final hyphenator = Hyphenator(config);
+    final wrap = hyphenator.wrap(Text(str), sRoboto, 360.0);
+    expect(wrap.textStr, str);
+    expect(wrap.size, Size(64, 16));
+    expect(wrap.isSizeMatching, true);
+  });
+
+  test('wrap-multiple-words-100-width', () {
     final style =
         TextStyle(fontWeight: FontWeight.normal, fontSize: 14).merge(sRoboto);
     final text = Text(
@@ -213,7 +237,7 @@ disciplines.""";
     expect(res.textStr, expected);
   });
 
-  test('linewrapper-160', () {
+  test('wrap-multiple-words-160-width', () {
     final style =
         TextStyle(fontWeight: FontWeight.normal, fontSize: 14).merge(sRoboto);
     final text = Text(
@@ -226,53 +250,41 @@ and disciplines.""";
     final hyphenator = Hyphenator(config);
 
     WrapResult res = hyphenator.wrap(text, style, 160.0);
-    // print(res.textStr);
     expect(res.isSizeMatching, true);
     expect(res.textStr, expected);
   });
 
-  test('linewrapper-empty', () {
-    final style =
-        TextStyle(fontWeight: FontWeight.normal, fontSize: 14).merge(sRoboto);
+  test('wrap-word-empty', () {
     final text = Text("");
     final expected = "";
-
     final hyphenator = Hyphenator(config);
-
-    WrapResult res = hyphenator.wrap(text, style, 380.0);
+    WrapResult res = hyphenator.wrap(text, sRoboto, 380.0);
     expect(res.isSizeMatching, true);
     expect(res.textStr, expected);
   });
 
-  test('min letter count', () {
-    final hyphenator = Hyphenator(
-      config,
-      symbol: '_',
-      minLetterCount: 4,
-    );
+  // -------------------------------------------------------------------
+  // min letter count and min word length
+  // -------------------------------------------------------------------
 
+  test('hyphenate-test-minletter-4', () {
+    final hyphenator = Hyphenator(config, symbol: '_', minLetterCount: 4);
     expect(hyphenator.hyphenateText('disciplines'), 'disci_plines');
   });
 
-  test('min letter count dont raise', () {
-    final hyphenator = Hyphenator(
-      config,
-      symbol: '_',
-      minLetterCount: 50,
-    );
-
+  test('hyphenate-test-minletter-50', () {
+    final hyphenator = Hyphenator(config, symbol: '_', minLetterCount: 50);
     expect(hyphenator.hyphenateText('disciplines'), 'disciplines');
   });
 
-  test('min word length', () {
-    final hyphenator = Hyphenator(
-      config,
-      symbol: '_',
-      minWordLength: 50,
-    );
-
+  test('hyphenate-text-min-wordlength-50', () {
+    final hyphenator = Hyphenator(config, symbol: '_', minWordLength: 50);
     expect(hyphenator.hyphenateText('disciplines'), 'disciplines');
   });
+
+  // -------------------------------------------------------------------
+  // stopwatch
+  // -------------------------------------------------------------------
 
   test('stopwatch', () {
     final stopwatchesInit = <int>[];
