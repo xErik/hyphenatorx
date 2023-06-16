@@ -185,6 +185,13 @@ disciplines.""";
     expect(wrap.textStr, expected);
   });
 
+  test('hyphenate-wrapNoHyphen-two-words', () {
+    final text = Text('test test', style: sRoboto);
+    final wrap = Hyphenator.wrapNoHyphen(text, sRoboto, 50);
+    print(wrap.size);
+    expect(wrap.textStr, 'test\ntest');
+  });
+
   // -------------------------------------------------------------------
   // wrap()
   // -------------------------------------------------------------------

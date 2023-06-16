@@ -1,13 +1,13 @@
 # Hyphenator
 
-Implementation of an hyphenation algorithm.
+Implementation of an hyphenation algorithm for various languages, based on TeX definitions.
 
 * Offers a `Widget` hyphenating a `String` and wrapping the result based on the available width.
 * Offers various function calls to hyphenate a `String` at all possible positions. 
 
-The `tex` patterns used in the algorithm can be at [tug.org](https://tug.org/tex-hyphen/).
-
 The package seems to work fine for western languages, other languages have to be evaluated.
+
+The `tex` patterns used in the algorithm can be at [tug.org](https://tug.org/tex-hyphen/).
 
 Test the live demo [https://xerik.github.io/hyphenatorx/](https://xerik.github.io/hyphenatorx/).
 
@@ -222,7 +222,7 @@ List<String> abbr = Hyphenator.languageAbbr();
 
 print(abbr); 
 
-// [af, as, bg, bn, ca, .., zh_latn_pinyin]
+[af, as, bg, bn, ca, cop, cs, cy, da, de_1901, de_1996, de_ch_1901, el_monoton, el_polyton, en_gb, en_us, eo, es, et, eu, fi, fr, fur, ga, gl, grc, gu, hi, hr, hsb, hu, hy, ia, id, is, it, ka, kmr, kn, la_x_classic, la, lt, lv, ml, mn_cyrl_x_lmc, mn_cyrl, mr, mul_ethi, nb, nl, nn, or, pa, pl, pms, pt, rm, ro, ru, sa, sh_cyrl, sk, sl, sv, ta, te, th, tk, tr, uk, zh_latn_pinyin]
 ```
 
 ### Enum

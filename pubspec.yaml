@@ -1,6 +1,6 @@
 name: hyphenatorx 
-description: Implementation of an hyphenation algorithm, based on TeX definitions.
-version: 1.5.6
+description: Implementation of an hyphenation algorithm for various languages, based on TeX definitions.
+version: 1.5.6+1
 repository: https://github.com/xErik/hyphenatorx
 issue_tracker: https://github.com/xErik/hyphenatorx/issues
 

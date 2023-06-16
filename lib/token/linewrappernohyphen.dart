@@ -141,12 +141,14 @@ class LineWrapperNoHyphen {
     final wrap = WrapResult(
         TextHelper.clone(_text, str), _style, _maxWidth, _painter.size, _lines);
 
+    // print(_lines);
+
     // if (kDebugMode) {
-    //   print('RENDERED lines   paint:\n${wrap.debugSizeOfLines}');
-    //   print('RENDERED string  paint:\n$str');
-    //   print('RENDERED size by paint: ${_painter.size}');
-    //   print('RENDERED size by token: ${wrap.debugSizeByText}');
-    //   print('RENDERED      maxWidth: ${wrap.maxWidth}');
+    // print('RENDERED lines   paint:\n${wrap.debugSizeOfLines}');
+    // print('RENDERED string  paint:\n$str');
+    // print('RENDERED size by paint: ${_painter.size}');
+    // print('RENDERED size by token: ${wrap.debugSizeByText}');
+    // print('RENDERED      maxWidth: ${wrap.maxWidth}');
     // }
     return wrap;
   }
