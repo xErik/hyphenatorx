@@ -271,6 +271,24 @@ and disciplines.""";
   });
 
   // -------------------------------------------------------------------
+  // no-wrap()
+  // -------------------------------------------------------------------
+
+  test('no-wrap-multiple-words-160-width', () {
+    final style =
+        TextStyle(fontWeight: FontWeight.normal, fontSize: 14).merge(sRoboto);
+    final text = Text("""A vast subdivision of 
+culture, composed of many creative 
+endeavors and disciplines.""");
+    final expected =
+        """A vast subdivision of culture, composed of many creative endeavors and disciplines.""";
+
+    WrapResult res = Hyphenator.noWrapNoHyphen(text, style, 523.0);
+    expect(res.isSizeMatching, true);
+    expect(res.textStr, expected);
+  });
+
+  // -------------------------------------------------------------------
   // min letter count and min word length
   // -------------------------------------------------------------------
 

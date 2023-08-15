@@ -95,7 +95,7 @@ final hyphernator = await Hyphenator.loadAsyncByAbbr(
     'en_us', 
     symbol: '_');
 ```
-list of valid letters of all western alphabets, including grave, acute, circumflex and all other letter variations.
+
 ### Synchronous Instantiation
 
 Instatiate the appropriate `Language_XX()` object.

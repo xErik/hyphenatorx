@@ -77,3 +77,7 @@
 ## 1.5.6+2 
 
 - Tests.
+
+## 1.5.7
+
+- Added service method for no-wrap and no-hyphenation calculation: Hyphenator.noWrapNoHyphen()
