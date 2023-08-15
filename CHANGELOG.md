@@ -85,3 +85,7 @@
 ## 1.5.8
 
 - Added multiple lines to: Hyphenator.noWrapNoHyphen()
+
+## 1.5.9
+
+- Refactoring.

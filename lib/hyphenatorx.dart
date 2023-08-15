@@ -7,7 +7,6 @@ import 'languages/languageconfig.dart';
 import 'src/calculationhelper.dart';
 import 'src/letterutil.dart';
 import 'src/pattern.dart';
-import 'token/linenowrappernohyphen.dart';
 import 'token/linewrapperhyphen.dart';
 import 'token/linewrappernohyphen.dart';
 import 'token/tokens.dart';
@@ -143,31 +142,6 @@ class Hyphenator {
     }
     // print(tokens);
     final wrapper = LineWrapperNoHyphen(tokens, text, style, maxWidth);
-    return wrapper.render();
-  }
-
-  /// Service method to NOT wrap a text and NOT perform hyphenation.
-  static WrapResult noWrapNoHyphen(
-      final Text text, final TextStyle style, final double maxWidth) {
-    final List<TextPartToken> tokens = [];
-
-    final List<String> parts =
-        text.data!.replaceAll(reR, '').splitWithDelim(_split);
-
-    for (final part in parts) {
-      if (part.isEmpty) {
-        // hu?!
-      } else if (part == '\n') {
-        // IGNORE !
-        // tokens.add(NewlineToken());
-      } else if (part.trim().isEmpty) {
-        tokens.add(TabsAndSpacesToken(part));
-      } else {
-        tokens.add(WordToken([WordPartToken(part)]));
-      }
-    }
-    // print(tokens);
-    final wrapper = LineNoWrapperNoHyphen(tokens, text, style, maxWidth);
     return wrapper.render();
   }
 

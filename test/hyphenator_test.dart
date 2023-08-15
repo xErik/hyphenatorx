@@ -266,7 +266,7 @@ and disciplines.""";
     final expected = "";
     final hyphenator = Hyphenator(config);
     WrapResult res = hyphenator.wrap(text, sRoboto, 380.0);
-    expect(res.isSizeMatching, true);
+    expect(res.isSizeMatching, false);
     expect(res.textStr, expected);
   });
 
@@ -274,19 +274,36 @@ and disciplines.""";
   // no-wrap()
   // -------------------------------------------------------------------
 
-  test('no-wrap-multiple-words-160-width', () {
+  test('no-wrap-multiple-words-540-width', () {
     final style =
         TextStyle(fontWeight: FontWeight.normal, fontSize: 14).merge(sRoboto);
-    final text = Text("""A vast subdivision of 
-culture, composed of many creative 
-endeavors and disciplines.""", maxLines: 1);
+    final text = Text(
+        """A vast subdivision of culture, composed of many creative endeavors and disciplines.""",
+        maxLines: 1);
     final expected =
         """A vast subdivision of culture, composed of many creative endeavors and disciplines.""";
 
-    WrapResult res = Hyphenator.noWrapNoHyphen(text, style, 540.0);
+    WrapResult res = Hyphenator.wrapNoHyphen(text, style, 540.0);
+    print(res);
+    expect(res.isSizeMatching, true);
+    expect(res.textStr, expected);
+    expect(res.size, Size(523, 16));
+  });
+
+  test('no-wrap-multiple-words-270-width', () {
+    final style =
+        TextStyle(fontWeight: FontWeight.normal, fontSize: 14).merge(sRoboto);
+    final text = Text(
+        """A vast subdivision of culture, composed of many creative endeavors and disciplines.""",
+        maxLines: 2);
+    final expected = """A vast subdivision of culture, composed of
+many creative endeavors and disciplines.""";
+
+    WrapResult res = Hyphenator.wrapNoHyphen(text, style, 270.0);
     // print(res);
     expect(res.isSizeMatching, true);
     expect(res.textStr, expected);
+    expect(res.size, Size(264, 32));
   });
 
   // -------------------------------------------------------------------

@@ -133,6 +133,10 @@ class LineWrapperNoHyphen {
       _lines.add(line);
     }
 
+    if (_text.maxLines != null && _lines.length > _text.maxLines!) {
+      return WrapResult(_text, _style, _maxWidth, Size(0, 0), _lines);
+    }
+
     final str =
         _lines.map<String>((line) => line.map((e) => e.render()).join()).join();
     _painter.text = TextSpan(text: str, style: _style);

@@ -13,7 +13,7 @@ class WrapResult {
   late final bool isSizeMatching;
 
   WrapResult(this.text, this.style, this.maxWidth, this.size, this.tokens) {
-    isSizeMatching = size.width <= maxWidth;
+    isSizeMatching = size.width <= maxWidth && size.width != 0;
   }
 
   /// Get the String content from Text.
