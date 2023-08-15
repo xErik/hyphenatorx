@@ -81,3 +81,7 @@
 ## 1.5.7
 
 - Added service method for no-wrap and no-hyphenation calculation: Hyphenator.noWrapNoHyphen()
+
+## 1.5.8
+
+- Added multiple lines to: Hyphenator.noWrapNoHyphen()

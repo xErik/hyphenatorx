@@ -73,7 +73,50 @@ class LineNoWrapperNoHyphen {
 
     while (true) {
       var token = _tokenIter.current();
-      line.add(token);
+
+      // ------------------------------------------------------------
+      // NEWLINE
+      // ------------------------------------------------------------
+      // if (token is NewlineToken) {
+      //   _lines.add(_cloneLineAndAddNewline(line));
+      //   line.clear();
+      // } else
+      // ------------------------------------------------------------
+      // TABS AND SPACES
+      // ------------------------------------------------------------
+      if (token is TabsAndSpacesToken && line.isNotEmpty) {
+        if (_canAddNoHyphen([token], line)) {
+          line.add(token);
+        } else {
+          _lines.add(_cloneLineAndAddNewline(line));
+          line.clear();
+        }
+      } else
+      // ------------------------------------------------------------
+      // WORD
+      // ------------------------------------------------------------
+      if (token is WordToken) {
+        // print('ADING WORD TO LINE: $token');
+        bool trySuccess = _tryAddWordToLine(token, line);
+
+        if (trySuccess == false) {
+          if (line.isNotEmpty) {
+            _lines.add(_cloneLineAndAddNewline(line));
+            line.clear();
+          }
+          trySuccess = _tryAddWordToLine(token, line);
+          // print('ADING WORD TO EMPTY LINE: $token | $trySuccess | $line');
+
+          if (trySuccess == false) {
+            if (line.isNotEmpty) {
+              _lines.add(_cloneLineAndAddNewline(line));
+              line.clear();
+            }
+            // print('ADING WORD TO NEW EMPTY LINE -- FORCED: $token');
+            line.add(token);
+          }
+        }
+      }
 
       // ------------------------------------------------------------
       // NEXT TOKEN
@@ -88,6 +131,13 @@ class LineNoWrapperNoHyphen {
 
     if (line.isNotEmpty) {
       _lines.add(line);
+    }
+
+    final maxLines = _text.maxLines ?? 1;
+    // print('maxLines ${maxLines}');
+    // print('_lines.length ${_lines.length}');
+    if (_lines.length > maxLines) {
+      return WrapResult(_text, _style, _maxWidth, Size(0, 0), _lines);
     }
 
     final str =
@@ -108,5 +158,35 @@ class LineNoWrapperNoHyphen {
     // print('RENDERED      maxWidth: ${wrap.maxWidth}');
     // }
     return wrap;
+  }
+
+  bool _tryAddWordToLine(WordToken token, List<TextPartToken> line) {
+    if (_canAddNoHyphen(token.parts, line)) {
+      line.addAll(token.parts);
+      return true;
+    }
+    return false;
+  }
+
+  List<TextPartToken> _cloneLineAndAddNewline(List<TextPartToken> line) {
+    List<TextPartToken> clone = [...line];
+    while (clone.isNotEmpty && clone.last is TabsAndSpacesToken) {
+      clone.removeLast();
+    }
+    clone.add(NewlineToken());
+    return clone;
+  }
+
+  bool _canAddNoHyphen(
+      final List<TextPartToken> tokens, List<TextPartToken> line) {
+    double w = line.fold<double>(0, (sum, item) {
+      return sum + item.sizeCurrent!.width;
+    });
+
+    w += tokens.fold<double>(0, (sum, item) {
+      return sum + item.sizeCurrent!.width;
+    });
+
+    return w <= _maxWidth;
   }
 }

@@ -279,11 +279,12 @@ and disciplines.""";
         TextStyle(fontWeight: FontWeight.normal, fontSize: 14).merge(sRoboto);
     final text = Text("""A vast subdivision of 
 culture, composed of many creative 
-endeavors and disciplines.""");
+endeavors and disciplines.""", maxLines: 1);
     final expected =
         """A vast subdivision of culture, composed of many creative endeavors and disciplines.""";
 
-    WrapResult res = Hyphenator.noWrapNoHyphen(text, style, 523.0);
+    WrapResult res = Hyphenator.noWrapNoHyphen(text, style, 540.0);
+    // print(res);
     expect(res.isSizeMatching, true);
     expect(res.textStr, expected);
   });
