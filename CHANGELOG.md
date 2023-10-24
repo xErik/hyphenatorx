@@ -89,3 +89,7 @@
 ## 1.5.9
 
 - Refactoring.
+
+## 1.5.10
+
+- README fix ( https://github.com/xErik/hyphenatorx/pull/1 )
