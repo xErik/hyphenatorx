@@ -19,7 +19,7 @@ The package [text_wrap_auto_size](https://pub.dev/packages/text_wrap_auto_size) 
 ## Quickstart
 
 ```dart 
-import 'package:hyphenatorx/texthyphenated.dart';
+import 'package:hyphenatorx/widget/texthyphenated.dart';
 
 // sub-
 // di-
@@ -117,7 +117,7 @@ final hyphenator = Hyphenator(
 This Widget outputs a `Text`. It hyphenates and wraps the input `String` depending on the available width. 
 
 ```dart 
-import 'package:hyphenatorx/texthyphenated.dart';
+import 'package:hyphenatorx/widget/texthyphenated.dart';
 
 TextHyphenated('subdivision', 
   'en_us',
