@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hyphenatorx/hyphenatorx.dart';
-import 'package:hyphenatorx/languages/languageconfig.dart';
+import 'package:hyphenatorx/languages/language.dart';
 import 'package:hyphenatorx/widget/texthyphenated.dart';
 
 void main() {
@@ -97,7 +97,7 @@ class _HyphenatorExampleWidgetState extends State<HyphenatorExampleWidget> {
                             const Text(
                                 "TextHyphenated('subdivision', 'en_us', symbol:'@')"),
                             const SizedBox(height: 16),
-                            const TextHyphenated('subdivision', 'en_us',
+                            const TextHyphenated('subdivision', Language.language_en_us,
                                 symbol: '@'),
                           ],
                         ))));

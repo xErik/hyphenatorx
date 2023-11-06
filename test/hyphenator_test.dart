@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hyphenatorx/hyphenatorx.dart';
+import 'package:hyphenatorx/languages/language.dart';
 import 'package:hyphenatorx/languages/language_en_us.dart';
 import 'package:hyphenatorx/languages/languageconfig.dart';
 import 'package:hyphenatorx/token/wrapresult.dart';
@@ -44,7 +45,7 @@ void main() {
   });
 
   test('abbreviations', () async {
-    final abbr = await Hyphenator.languageAbbr();
+    final abbr = await Language.abbreviations();
     expect(abbr.contains('en_us'), true);
   });
 
@@ -66,7 +67,7 @@ void main() {
   });
 
   test('loadAsyncByAbbr', () async {
-    final hyphenator = await Hyphenator.loadAsyncByAbbr('en_us', symbol: '_');
+    final hyphenator = await Hyphenator.loadAsyncByAbbr(Language.language_en_us, symbol: '_');
     expect(hyphenator.hyphenateText('subdivision'), 'sub_di_vi_sion');
     expect(hyphenator.hyphenateText('creative'), 'cre_ative');
     expect(hyphenator.hyphenateText('disciplines'), 'dis_ci_plines');

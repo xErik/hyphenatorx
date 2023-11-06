@@ -1,6 +1,7 @@
 import 'dart:core';
 
 import 'package:flutter/material.dart';
+import 'package:hyphenatorx/languages/language.dart';
 import 'package:hyphenatorx/src/extensions.dart';
 
 import 'languages/languageconfig.dart';
@@ -18,20 +19,7 @@ class Hyphenator {
   static final RegExp _reBoundaries = RegExp(r'[\t\ ]+');
   static final RegExp _split = RegExp(r'\n|[\t ]+');
 
-  static Language getLanguageEnum(String lang) {
-    Language l;
-    final name = 'language_' + lang;
-    try {
-      l = Language.values.firstWhere((l) => l.name == name);
-    } catch (e) {
-      throw 'Language not found: $lang ($name). Try: ${languageAbbr()}';
-    }
-    return l;
-  }
 
-  /// Returns abbreviations of available languages.
-  static List<String> languageAbbr() =>
-      Language.values.map((e) => e.name.substring(9)).toList();
 
   /// Instantiates a Hyphenator with a given language
   /// configuration from JSON.
@@ -40,14 +28,14 @@ class Hyphenator {
   /// Throws if language is not found. Check  enum [Language] for
   /// complete list.
   static Future<Hyphenator> loadAsyncByAbbr(
-    final String lang, {
+    final Language lang, {
     final String symbol = '\u{00AD}',
     final String hyphen = '-',
     final int minWordLength = 5,
     final int minLetterCount = 3,
   }) async {
     return Hyphenator(
-      await LanguageConfig.load(getLanguageEnum(lang)),
+      await LanguageConfig.load(lang),
       symbol: symbol,
       hyphen: hyphen,
       minWordLength: minWordLength,

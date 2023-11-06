@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hyphenatorx/hyphenatorx.dart';
+import 'package:hyphenatorx/languages/language.dart';
 
 class TextHyphenated extends StatefulWidget {
   final String text;
-  final String language;
+  final Language language;
   final String symbol;
   final TextStyle? style;
   final GlobalKey? textKey;

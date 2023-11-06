@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hyphenatorx/languages/language.dart';
 import 'package:hyphenatorx/widget/texthyphenated.dart';
 
 class ExampleWidget extends StatefulWidget {
@@ -45,7 +46,7 @@ class _ExampleWidgetState extends State<ExampleWidget> {
               controller: controller,
               decoration: const InputDecoration(hintText: 'Enter some text')),
           const SizedBox(height: 16),
-          TextHyphenated(text, 'en_us',
+          TextHyphenated(text, Language.language_en_us,
               doShowDebug: true, style: const TextStyle(fontSize: 56)),
         ],
       ),

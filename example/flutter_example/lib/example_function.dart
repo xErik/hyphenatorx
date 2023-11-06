@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hyphenatorx/hyphenatorx.dart';
+import 'package:hyphenatorx/languages/language.dart';
 
 class ExampleFunction extends StatefulWidget {
   const ExampleFunction({Key? key}) : super(key: key);
@@ -31,7 +32,7 @@ class _ExampleFunctionState extends State<ExampleFunction> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _future = Hyphenator.loadAsyncByAbbr('en_us', symbol: '_');
+    _future = Hyphenator.loadAsyncByAbbr(Language.language_en_us, symbol: '_');
   }
 
   @override
