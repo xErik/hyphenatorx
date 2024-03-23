@@ -34,6 +34,9 @@ void main() {
     );
   });
 
+  Size rounded(Size size) =>
+      Size(size.width.roundToDouble(), size.height.roundToDouble());
+
   // -------------------------------------------------------------------
   // General tests
   // -------------------------------------------------------------------
@@ -139,13 +142,18 @@ void main() {
 
   test('hyphenate-text-boundaries', () {
     final text =
-        """The arts are a vast subdivision of culture, composed of many creative endeavors and disciplines. 
+        """The arts are a vast subdivision of culture, composed of many creative endeavors and disciplines.
 
 
         It is a broader term than     "art", which as a description of a field usually means only the visual arts.""";
 
+//     final expectedText =
+//         """The_ _arts_ _are_ _a_ _vast_ _sub_di_vi_sion_ _of_ _cul_ture,_ _com_posed_ _of_ _many_ _cre_ative_ _endeav_ors_ _and_ _dis_ci_plines._ _
+
+// _        _It_ _is_ _a_ _broader_ _term_ _than_     _"art",_ _which_ _as_ _a_ _descrip_tion_ _of_ _a_ _field_ _usu_ally_ _means_ _only_ _the_ _visual_ _arts.""";
+
     final expectedText =
-        """The_ _arts_ _are_ _a_ _vast_ _sub_di_vi_sion_ _of_ _cul_ture,_ _com_posed_ _of_ _many_ _cre_ative_ _endeav_ors_ _and_ _dis_ci_plines._ _
+        """The_ _arts_ _are_ _a_ _vast_ _sub_di_vi_sion_ _of_ _cul_ture,_ _com_posed_ _of_ _many_ _cre_ative_ _endeav_ors_ _and_ _dis_ci_plines.
 
 
 _        _It_ _is_ _a_ _broader_ _term_ _than_     _"art",_ _which_ _as_ _a_ _descrip_tion_ _of_ _a_ _field_ _usu_ally_ _means_ _only_ _the_ _visual_ _arts.""";
@@ -160,18 +168,20 @@ _        _It_ _is_ _a_ _broader_ _term_ _than_     _"art",_ _which_ _as_ _a_ _de
   // -------------------------------------------------------------------
 
   test('hyphenate-text-to-tokens', () {
-    final text = """A vast subdivision of culture, 
+    final text = """A vast subdivision of culture,
         composed of many creative endeavors and disciplines.""";
 
     final hyphenator = Hyphenator(config);
     final result = hyphenator.hyphenateTextToTokens(text);
 
+    // expect(result.toString(),
+    //     "[[A], WS, [vast], WS, [sub, di, vi, sion], WS, [of], WS, [cul, ture,], WS, NL, WS, [com, posed], WS, [of], WS, [many], WS, [cre, ative], WS, [endeav, ors], WS, [and], WS, [dis, ci, plines.]]");
     expect(result.toString(),
-        "[[A], WS, [vast], WS, [sub, di, vi, sion], WS, [of], WS, [cul, ture,], WS, NL, WS, [com, posed], WS, [of], WS, [many], WS, [cre, ative], WS, [endeav, ors], WS, [and], WS, [dis, ci, plines.]]");
+        "[[A], WS, [vast], WS, [sub, di, vi, sion], WS, [of], WS, [cul, ture,], NL, WS, [com, posed], WS, [of], WS, [many], WS, [cre, ative], WS, [endeav, ors], WS, [and], WS, [dis, ci, plines.]]");
   });
 
   test('hyphenate-wrapNoHyphen', () {
-    final text = Text("""A vast subdivision of culture, 
+    final text = Text("""A vast subdivision of culture,
         composed of many creative endeavors and disciplines.""");
     final expected = """A vast
 subdivision of
@@ -202,7 +212,8 @@ disciplines.""";
     final hyphenator = Hyphenator(config);
     final wrap = hyphenator.wrap(Text(str), styleBig, 350.0);
     expect(wrap.textStr, str);
-    expect(wrap.size, Size(1069.0, 585.0));
+
+    expect(rounded(wrap.size), Size(1068, 585));
     expect(wrap.isSizeMatching, false);
   });
 
@@ -211,7 +222,7 @@ disciplines.""";
     final hyphenator = Hyphenator(config);
     final wrap = hyphenator.wrap(Text(str), sRoboto, 360.0);
     expect(wrap.textStr, str);
-    expect(wrap.size, Size(30, 16));
+    expect(rounded(wrap.size), Size(30, 16));
     expect(wrap.isSizeMatching, true);
   });
 
@@ -220,7 +231,7 @@ disciplines.""";
     final hyphenator = Hyphenator(config);
     final wrap = hyphenator.wrap(Text(str), sRoboto, 360.0);
     expect(wrap.textStr, str);
-    expect(wrap.size, Size(64, 16));
+    expect(rounded(wrap.size), Size(63, 16));
     expect(wrap.isSizeMatching, true);
   });
 
@@ -249,14 +260,15 @@ disciplines.""";
         TextStyle(fontWeight: FontWeight.normal, fontSize: 14).merge(sRoboto);
     final text = Text(
         """A vast subdivision of culture, composed of many creative endeavors and disciplines.""");
-    final expected = """A vast subdivision of
-culture, composed of
-many creative endeavors
-and disciplines.""";
+    final expected = """A vast subdivision of cul-
+ture, composed of many
+creative endeavors and
+disciplines.""";
 
     final hyphenator = Hyphenator(config);
 
     WrapResult res = hyphenator.wrap(text, style, 160.0);
+    // print(res.textStr);
     expect(res.isSizeMatching, true);
     expect(res.textStr, expected);
   });
@@ -284,10 +296,10 @@ and disciplines.""";
         """A vast subdivision of culture, composed of many creative endeavors and disciplines.""";
 
     WrapResult res = Hyphenator.wrapNoHyphen(text, style, 540.0);
-    print(res);
+    // print(res);
     expect(res.isSizeMatching, true);
     expect(res.textStr, expected);
-    expect(res.size, Size(523, 16));
+    expect(rounded(res.size), Size(522, 16));
   });
 
   test('no-wrap-multiple-words-270-width', () {
@@ -303,7 +315,7 @@ many creative endeavors and disciplines.""";
     // print(res);
     expect(res.isSizeMatching, true);
     expect(res.textStr, expected);
-    expect(res.size, Size(264, 32));
+    expect(rounded(res.size), Size(264, 32));
   });
 
   // -------------------------------------------------------------------

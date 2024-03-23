@@ -94,11 +94,21 @@ class Hyphenator {
 
     final Map<String, List<int>> exceptions = {};
 
-    exceptions.addEntries(
-      (config.data['exception'] as Map<String, dynamic>)
-          .entries
-          .map((entry) => MapEntry(entry.key, List<int>.from(entry.value))),
-    );
+    // exceptions.addEntries(
+    //   (config.data['exception'] as Map<String, dynamic>)
+    //       .entries
+    //       .map((entry) => MapEntry(entry.key, List<int>.from(entry.value))),
+    // );
+
+    /// https://github.com/xErik/hyphenatorx/issues/4
+    if (config.data['exception'] is Map &&
+        (config.data['exception'] as Map).isNotEmpty) {
+      exceptions.addEntries(
+        (config.data['exception'] as Map<String, dynamic>)
+            .entries
+            .map((entry) => MapEntry(entry.key, List<int>.from(entry.value))),
+      );
+    }
 
     calc = CalculationHelper(
         patterns, exceptions, minLetterCount, minWordLength, symbol, hyphen);

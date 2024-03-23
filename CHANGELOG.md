@@ -65,16 +65,16 @@
 - Unit Tests.
 - WrapResult: attribute `textStr` to getter.
 
-## 1.5.6 
+## 1.5.6
 
 - Unit Tests.
 - Removed `TextTokens`.
 
-## 1.5.6+1 
+## 1.5.6+1
 
 - README.
 
-## 1.5.6+2 
+## 1.5.6+2
 
 - Tests.
 
@@ -93,3 +93,7 @@
 ## 1.5.10
 
 - README fix ( https://github.com/xErik/hyphenatorx/pull/1 )
+-
+## 1.5.11
+
+- Fix ( https://github.com/xErik/hyphenatorx/issues/4 )
